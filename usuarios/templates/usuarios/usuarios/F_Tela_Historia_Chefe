@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>História do Chefe</title>
+    <style>
+        body {
+            background-color: #f9ed95;
+            font-family: Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            background-color: #fff9cc;
+            margin: 50px auto;
+            padding: 25px 35px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        h1 {
+            text-align: center;
+            background-color: #e1a536;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .descricao {
+            margin-top: 15px;
+            color: #333;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .receitas {
+            margin-top: 25px;
+        }
+        .receitas h2 {
+            background-color: #B3DE58;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        ul {
+            list-style-type: square;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chef Maria Luisa</h1>
+
+        <p class="descricao">
+            Maria Luisa é uma chef apaixonada pela arte da culinária criativa. 
+            Desde jovem, encontrou na cozinha um espaço para transformar 
+            ingredientes simples em experiências únicas. Seu foco está em receitas 
+            artesanais e combinações de sabores regionais com um toque moderno.
+        </p>
+
+        <div class="receitas">
+            <h2>Principais Receitas</h2>
+            <ul>
+                <li>Hambúrguer artesanal com molho de ervas</li>
+                <li>Torta de banana caramelizada</li>
+                <li>Pão de fermentação natural</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
