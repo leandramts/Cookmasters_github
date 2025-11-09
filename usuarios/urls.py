@@ -11,5 +11,5 @@ urlpatterns = [
         authentication_form=FormularioLoginUsuario
     ), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-
+    path('chefe/', views.historia_chefe, name = "historia_chefe")
 ]

@@ -75,3 +75,8 @@ class FormularioLoginUsuario(AuthenticationForm):
         strip=False,
         widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'class': 'form-control'})
     )
+class HistoriaChefeForm(forms.Form):
+    nome = forms.CharField(label='Nome do Chef', max_length=100)
+    descricao = forms.CharField(label='Resumo da História', widget=forms.Textarea)
+    receitas = forms.CharField(label='Principais Receitas', widget=forms.Textarea)
+
