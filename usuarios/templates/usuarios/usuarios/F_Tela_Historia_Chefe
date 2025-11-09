@@ -25,46 +25,47 @@
             padding: 10px;
             border-radius: 10px;
         }
-        .descricao {
+        form {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
             margin-top: 15px;
-            color: #333;
-            line-height: 1.6;
-            text-align: justify;
+            font-weight: bold;
         }
-        .receitas {
-            margin-top: 25px;
-        }
-        .receitas h2 {
-            background-color: #B3DE58;
+        textarea, input {
+            width: 100%;
             padding: 8px;
-            border-radius: 8px;
-            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-top: 5px;
         }
-        ul {
-            list-style-type: square;
-            padding-left: 20px;
+        button {
+            margin-top: 20px;
+            background-color: #B3DE58;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #a0c84f;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Chef Maria Luisa</h1>
+        <h1>Conte sua História</h1>
 
-        <p class="descricao">
-            Maria Luisa é uma chef apaixonada pela arte da culinária criativa. 
-            Desde jovem, encontrou na cozinha um espaço para transformar 
-            ingredientes simples em experiências únicas. Seu foco está em receitas 
-            artesanais e combinações de sabores regionais com um toque moderno.
-        </p>
-
-        <div class="receitas">
-            <h2>Principais Receitas</h2>
-            <ul>
-                <li>Hambúrguer artesanal com molho de ervas</li>
-                <li>Torta de banana caramelizada</li>
-                <li>Pão de fermentação natural</li>
-            </ul>
-        </div>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Publicar História</button>
+        </form>
     </div>
 </body>
 </html>
