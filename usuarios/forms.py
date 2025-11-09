@@ -1,5 +1,6 @@
 # usuarios/forms.py
 from django.forms import ModelForm
+from django.contrib.auth.forms import AuthenticationForm
 from .models import E_UsuarioGeral
 from django import forms
 from django.contrib.auth.models import Group  
@@ -62,3 +63,15 @@ class FormularioCadastroUsuario(forms.ModelForm):
             E_Consumidor.objects.create(usuario=user)
         
         return user
+    
+class FormularioLoginUsuario(AuthenticationForm):
+    username = forms.EmailField(
+        label='E-mail',
+        widget=forms.EmailInput(attrs={'autofocus': True, 'class': 'form-control'})
+    )
+
+    password = forms.CharField(
+        label='Senha', 
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'class': 'form-control'})
+    )
