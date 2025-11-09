@@ -1,3 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from .forms import FormularioCadastroUsuario
 
-# Create your views here.
+def cadastro_view(request):
+    if request.method == 'POST':
+        form = FormularioCadastroUsuario(request.POST)
+        if form.is_valid():
+            form.save() 
+            
+            return redirect('home') 
+    else:
+        form = FormularioCadastroUsuario()
+    
+    return render(request, 'usuarios/F_Tela_Cadastro.html', {'form': form})
