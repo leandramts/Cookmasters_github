@@ -2,7 +2,33 @@
 
 {% block content %}
 
-    <h1>Bem-vindo ao Cookmasters!</h1>
-    <p>Sua plataforma para descobrir e partilhar receitas.</p>
-    
-    {% endblock %}
+    <div class="boas-vindas">
+        {% if user.is_authenticated %}
+            <h2>Olá, {{ user.nome }}!</h2>
+            <p>Pronto para cozinhar? Veja as receitas em destaque:</p>
+        {% else %}
+            <h1>Bem-vindo ao Cookmasters!</h1>
+            <p>Sua plataforma para descobrir e partilhar receitas. Faça login ou cadastre-se!</p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <h2>Receitas em Destaque</h2>
+
+    <div class="recipe-grid">
+        {% for receita in receitas %}
+            <div class="recipe-card">
+                <h3>{{ receita.nome }}</h3>
+                <p>Por: {{ receita.autor.usuario.nome }}</p>
+                <p>Nota: {{ receita.nota }} ★</p>
+                <p>Preço: R$ {{ receita.preco }}</p>
+                <p>Tag: {{ receita.get_tag_display }}</p>
+            </div>
+        
+        {% empty %}
+            <p>Ainda não há receitas cadastradas no site.</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}
