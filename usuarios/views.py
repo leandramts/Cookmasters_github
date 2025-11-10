@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import FormularioCadastroUsuario
+from .forms import HistoriaChefeForm
 
 def cadastro_view(request):
     if request.method == 'POST':
@@ -25,5 +26,5 @@ def historia_chefe(request):
         }
         return render(request, 'usuarios/chefe_historia.html', contexto)
     else:
-        form = HistoriaChefe()
-    return render(request, 'usuarios/chefe_form.html')
+        form = HistoriaChefeForm()
+    return render(request, 'usuarios/F_Tela_Historia_Chefe.html')
