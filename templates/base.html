@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cookmasters</title>
+    </head>
+<body>
+
+    <nav>
+        <a href="{% url 'home' %}">Home</a>
+        
+        <a href="{% url 'usuarios:login' %}">Login</a>
+        <a href="{% url 'usuarios:cadastro' %}">Cadastra-se</a>
+        
+        <a href="{% url 'receitas:cadastrar_ingredientes' %}"> CadastrarIngredientes</a>
+
+        <a href="{% url 'receitas:cadastrar_receita' %}"> CadastrarReceita</a>
+        
+        {% if user.is_authenticated %}
+            <a href="{% url 'usuarios:logout' %}">Sair</a>
+        {% endif %}
+    </nav>
+
+    <hr>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>

@@ -4,6 +4,8 @@ from . import views
 from django.contrib.auth import views as auth_views
 from .forms import FormularioLoginUsuario
 
+app_name = 'usuarios'
+
 urlpatterns = [
     path('cadastro/', views.cadastro_view, name='cadastro'),
     path('login/', auth_views.LoginView.as_view(
