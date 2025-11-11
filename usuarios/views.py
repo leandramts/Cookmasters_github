@@ -1,36 +1,41 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import FormularioCadastroUsuario, HistoriaChefeForm
-
+from .forms import (
+    FormularioCadastroChefe, 
+    FormularioCadastroConsumidor, 
+    FormularioCadastroAdm,
+    HistoriaChefeForm
+)
+from django.contrib.auth import login
 
 def escolher_tipo_usuario(request):
     return render(request, 'usuarios/F_Tela_Escolher_Tipo.html')
 
 def cadastro_chefe(request):
     if request.method == 'POST':
-        form = FormularioCadastroUsuario(request.POST)
+        form = FormularioCadastroChefe(request.POST)
         if form.is_valid():
             usuario = form.save(commit=False)
             usuario.tipo = 'chefe'  
             usuario.save()
             messages.success(request, f'Chefe {usuario.nome} cadastrado com sucesso!')
-            return redirect('historia_chefe')
+            return redirect('usuarios:historia_chefe')
     else:
-        form = FormularioCadastroUsuario()
+        form = FormularioCadastroChefe()
 
     return render(request, 'usuarios/F_Tela_Cadastro_Chefe.html', {'form': form})
 
 def cadastro_consumidor(request):
     if request.method == 'POST':
-        form = FormularioCadastroUsuario(request.POST)
+        form = FormularioCadastroConsumidor(request.POST)
         if form.is_valid():
-            usuario = form.save(commit=False)
-            usuario.tipo = 'consumidor'
-            usuario.save()
+            usuario = form.save()
+            login(request, usuario, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f'Consumidor {usuario.nome} cadastrado com sucesso!')
             return redirect('home')
     else:
-        form = FormularioCadastroUsuario()
+        # CORREÇÃO AQUI
+        form = FormularioCadastroConsumidor()
 
     return render(request, 'usuarios/F_Tela_Cadastro_Consumidor.html', {'form': form})
 
@@ -42,7 +47,7 @@ def cadastro_adm(request):
         messages.info(request, f'Solicitação de acesso enviada para o administrador da empresa ({email}).')
         return redirect('home')
 
-    return render(request, 'usuarios/F_Tela_Cadastro_Adm.html')
+    return render(request, 'usuarios/F_Tela_Cadastrar_Adm.html')
 
 def historia_chefe(request):
     if request.method == 'POST':

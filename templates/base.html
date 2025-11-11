@@ -8,14 +8,14 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     
 </head>
-<body class="hom">
+<body class="home">
     
 
     <nav>
         <a href="{% url 'home' %}">Home</a>
         
         <a href="{% url 'usuarios:login' %}">Login</a>
-        <a href="{% url 'usuarios:cadastro' %}">Cadastra-se</a>
+        <a href="{% url 'usuarios:escolher_tipo' %}">Cadastra-se</a>
         
         <a href="{% url 'receitas:cadastrar_receita' %}">Cadastrar Receita</a>
         <a href="{% url 'receitas:cadastrar_ingredientes' %}">Cadastrar Ingredientes</a>
