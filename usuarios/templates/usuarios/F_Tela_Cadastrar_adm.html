@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>História do Chefe</title>
+    <style>
+        body {
+            background-color: #f9ed95;
+            font-family: Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff9cc;
+            padding: 25px 35px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 400px;
+            text-align: center;
+        }
+        h1 {
+            background-color: #e1a536;
+            color: #333;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        form { text-align: left; }
+        label {
+            color: #333;
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 20px;
+            background-color: #B3DE58;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sua História de Chefe</h1>
+        <form method="post">
+            {% csrf_token %}
+            <label>Nome:</label>
+            <input type="text" name="nome" required>
+
+            <label>Resumo / História:</label>
+            <textarea name="resumo" rows="4" required></textarea>
+
+            <label>Receitas (separe por ponto e vírgula):</label>
+            <textarea name="receitas" rows="3" placeholder="Ex: bolo de cenoura; lasanha; pudim"></textarea>
+
+            <button type="submit">Enviar História</button>
+        </form>
+    </div>
+</body>
+</html>

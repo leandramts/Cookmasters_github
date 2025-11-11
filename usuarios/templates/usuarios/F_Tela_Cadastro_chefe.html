@@ -2,8 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Usuário</title>
+    <title>Cadastro de Chefe</title>
     <style>
         body {
             background-color: #f9ed95;
@@ -30,18 +29,14 @@
             font-size: 20px;
             margin-bottom: 20px;
         }
-        form {
-            text-align: left;
-        }
+        form { text-align: left; }
         label {
             color: #333;
             margin-top: 10px;
             font-weight: bold;
             display: block;
         }
-        input[type="text"],
-        input[type="email"],
-        input[type="password"] {
+        input, textarea {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -55,10 +50,8 @@
             border: none;
             padding: 10px 20px;
             font-weight: bold;
-            font-size: 14px;
             border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
             width: 100%;
         }
         button:hover {
@@ -68,11 +61,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Cadastro de Usuário</h1>
+        <h1>Cadastro de Chefe</h1>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Cadastrar</button>
+            <button type="submit">Cadastrar Chefe</button>
         </form>
     </div>
 </body>
