@@ -1,0 +1,25 @@
+<form method="POST">
+    {% csrf_token %}
+    
+    <label>Nome da Receita:</label>
+    <input type="text" name="nome" required>
+
+    <label>Preço:</label>
+    <input type="number" step="0.01" name="preco" required>
+
+    <label>Descrição:</label>
+    <textarea name="descricao" required></textarea>
+
+    <label>Tag:</label>
+    <select name="tag">
+        <option value="">-- Selecione --</option>
+        {% for valor, label in tags %}
+            <option value="{{ valor }}">{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Ingredientes (separe por vírgula):</label>
+    <input type="text" name="ingredientes">
+
+    <button type="submit">Cadastrar Receita</button>
+</form>
