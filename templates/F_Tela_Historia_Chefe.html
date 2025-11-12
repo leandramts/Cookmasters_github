@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="container-auth">
+        <h1>Sua História de Chefe</h1>
+        <p>Conte-nos um pouco sobre você. (Obrigatório)</p>
+        
+        <form method="post">
+            {% csrf_token %}
+
+            {% if messages %}
+                <ul class="messages">
+                {% for message in messages %}
+                    <li class="error">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+            <label for="descricao">Sua História / Descrição:</label>
+            <textarea name="descricao" rows="5" required>{{ chefe.descricao }}</textarea>
+
+            <button type="submit">Salvar História</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

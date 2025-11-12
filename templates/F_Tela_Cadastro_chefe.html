@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="container-auth">
+        <h1>Cadastro de Chefe</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+
+            {% if messages %}
+                <ul class="messages">
+                {% for message in messages %}
+                    <li class="error">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+            <label for="nome">Nome:</label>
+            <input type="text" name="nome" id="nome" required>
+
+            <label for="email">E-mail:</label>
+            <input type="email" name="email" id="email" required>
+
+            <label for="cpf">CPF:</label>
+            <input type="text" name="cpf" id="cpf" required>
+
+            <label for="senha">Senha:</label>
+            <input type="password" name="senha" id="senha" required>
+
+            <label for="senha_confirm">Confirme a Senha:</label>
+            <input type="password" name="senha_confirm" id="senha_confirm" required>
+
+            <button type="submit">Cadastrar Chefe</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

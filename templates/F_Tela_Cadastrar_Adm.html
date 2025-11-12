@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="container-auth">
+        <h1>Cadastro de Administrador</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="email">E-mail para Solicitação:</label>
+            <input type="email" name="email" id="email" required>
+
+            <button type="submit">Solicitar Acesso</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
