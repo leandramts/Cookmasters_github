@@ -1,12 +1,43 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
+class E_UsuarioGeralManager(BaseUserManager):
+
+    
+    def create_user(self, email, nome, password=None, **extra_fields):
+        if not email:
+            raise ValueError('O campo Email é obrigatório')
+        if not nome:
+            raise ValueError('O campo Nome é obrigatório')
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, nome=nome, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, nome, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superusuário deve ter is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superusuário deve ter is_superuser=True.')
+
+        return self.create_user(email, nome, password, **extra_fields)
+
 class E_UsuarioGeral(AbstractUser):
-    #Herda email e senha de AbstractUser
+    username = None
     nome = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nome']
+
+    objects = E_UsuarioGeralManager()
+    def __str__(self):
+        return self.email
 
 
 class E_Chefe(models.Model):
@@ -70,5 +101,3 @@ class E_Pagamento(models.Model):
     tipo_pagamento = models.CharField(max_length=50) 
     preco_total = models.DecimalField(max_digits=7, decimal_places=2)
     taxa_adm = models.DecimalField(max_digits=5, decimal_places=2)
-
-    #Numero de cartao, nome do banco, senha estão num gateway de pagamento
