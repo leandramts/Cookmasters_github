@@ -148,3 +148,30 @@ nav :hover {
     border-radius: 4px;
     text-align: center;
 }
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1em;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tag {
+    background-color: #ffb347;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.no-tag {
+    color: #888;
+    font-style: italic;
+}

@@ -35,23 +35,25 @@ class E_Ingrediente(models.Model):
     def __str__(self):
         return self.nome
 
+class E_Tag(models.Model):
+    nome = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.nome
+
+
 class E_Receita(models.Model):
-    TAGS = [
-        ('LOW CARB', 'Low Carb'),
-        ('SEM LACTOSE', 'Sem Lactose'),
-        ('SEM GLUTEN', 'Sem Glúten'),
-        ('VEGANO', 'Vegano'),
-        ('VEGETARIANO', 'Vegetariano'),
-        ('LOW FAT', 'Low Fat'),
-        ('HIGH PROTEIN', 'High Protein'),
-        ('SEM SOJA', 'Sem Soja'),
+    TAGS_PADRAO = [
+        'Low Carb', 'Sem Lactose', 'Sem Glúten', 'Vegano',
+        'Vegetariano', 'Low Fat', 'High Protein', 'Sem Soja',
     ]
     autor = models.ForeignKey(E_Chefe, on_delete=models.CASCADE)
     nome = models.CharField(max_length=255)
     preco = models.DecimalField(max_digits=6, decimal_places=2)
     descricao = models.TextField()
+    modo_de_preparo = models.TextField(default="Sem modo de preparo informado")
     nota = models.IntegerField(default=0)
-    tag = models.CharField(max_length=50, choices=TAGS, blank=True)
+    tags = models.ManyToManyField(E_Tag, related_name='receitas', blank=True)
     ingredientes = models.ManyToManyField('E_Ingrediente', related_name='receitas')
 
     def __str__(self):

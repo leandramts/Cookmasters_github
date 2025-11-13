@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class = "home-bg">
+<div class="home-bg">
 
     <div class="boas-vindas">
         {% if user.is_authenticated %}
@@ -24,13 +24,22 @@
                 <p>Por: {{ receita.autor.usuario.nome }}</p>
                 <p>Nota: {{ receita.nota }} ★</p>
                 <p>Preço: R$ {{ receita.preco }}</p>
-                <p>Tag: {{ receita.get_tag_display }}</p>
+
+                <p><strong>Tags:</strong>
+                    {% if receita.tags.all %}
+                        {% for tag in receita.tags.all %}
+                            <span class="tag">{{ tag.nome }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="no-tag">Sem tags</span>
+                    {% endif %}
+                </p>
             </div>
-        
         {% empty %}
             <p>Ainda não há receitas cadastradas no site.</p>
         {% endfor %}
     </div>
 
 </div>
+
 {% endblock %}
