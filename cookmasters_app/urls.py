@@ -18,5 +18,4 @@ urlpatterns = [
 
     # Rotas de Receitas
     path('receitas/cadastrar/', views.cadastrar_receita, name='cadastrar_receita'),
-    path('receitas/ingredientes/', views.cadastrar_ingredientes, name='cadastrar_ingredientes'),
 ]
