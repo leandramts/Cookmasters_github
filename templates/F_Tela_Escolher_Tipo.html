@@ -1,6 +1,62 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.auth-page {
+    background-color: #f7e98e; 
+    min-height: calc(100vh - 60px); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px; 
+}
+
+.container-auth {
+    background-color: #fff6c8;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    text-align: center;
+    width: 320px;
+}
+
+
+.container-auth h1 {
+    background-color: #d48b23;
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    font-size: 20px;
+}
+
+.botao-link {
+    display: block;
+    background-color: #b4e27b; 
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 12px 0;           
+    border-radius: 8px;
+    margin: 12px auto;
+    width: 80%;               
+    text-align: center;        
+    transition: 0.3s;
+    box-sizing: border-box;    
+}
+.botao-link:hover {
+    background-color: #9ed65d;
+    transform: scale(1.05);
+}
+</style>
+
 <div class="auth-page">
     <div class="container-auth">
         <h1>Escolha o Tipo de Usuário</h1>
