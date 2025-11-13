@@ -52,9 +52,11 @@ class E_Receita(models.Model):
     descricao = models.TextField()
     nota = models.IntegerField(default=0)
     tag = models.CharField(max_length=50, choices=TAGS, blank=True)
+    ingredientes = models.ManyToManyField('E_Ingrediente', related_name='receitas')
 
     def __str__(self):
         return self.nome
+
 
 
 class E_Avaliacoes(models.Model):

@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from .models import E_UsuarioGeral, E_Chefe, E_Consumidor, E_Receita, E_Ingrediente
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+
 
 # ----------------------------------------
 # View da Home (Antigo app 'home')
@@ -120,50 +121,48 @@ def cadastro_chefe(request):
     View de cadastro manual de Chefe.
     """
     if request.method == 'POST':
-        # 1. Obter dados
         nome = request.POST.get('nome')
         email = request.POST.get('email')
         senha = request.POST.get('senha')
         senha_confirm = request.POST.get('senha_confirm')
         cpf = request.POST.get('cpf')
-        # ... (obter outros campos: dados_bancarios, etc.) ...
 
-        # 2. Validação (FAZER IGUAL AO cadastro_consumidor)
-        # (Verificar senhas, se email existe, etc.)
+        # 🔎 Validações
         if senha != senha_confirm:
             messages.error(request, "As senhas não são iguais.")
             return render(request, 'F_Tela_Cadastro_Chefe.html')
-        
-        if not cpf: # Exemplo de validação extra
-             messages.error(request, "O CPF é obrigatório para Chefes.")
-             return render(request, 'F_Tela_Cadastro_Chefe.html')
 
-        # 3. Salvar (Manual)
+        if not cpf:
+            messages.error(request, "O CPF é obrigatório para Chefes.")
+            return render(request, 'F_Tela_Cadastro_Chefe.html')
+
         try:
+            # ✅ Corrigido: adicionando username=email
             user = E_UsuarioGeral.objects.create_user(
+                username=email,
                 email=email,
                 nome=nome,
                 password=senha
             )
-            # Criar o perfil de Chefe com os dados extras
+
+            # Cria o perfil de Chefe
             E_Chefe.objects.create(
-                usuario=user, 
+                usuario=user,
                 cpf=cpf
-                # ... (outros campos: dados_bancarios=dados_bancarios, etc.) ...
             )
 
-            # 4. Sucesso
+            # ✅ Login automático
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f'Chefe {nome} cadastrado com sucesso!')
-            return redirect('historia_chefe') # Redireciona SEM namespace
+            return redirect('historia_Chefe')
 
         except Exception as e:
             messages.error(request, f"Ocorreu um erro: {e}")
             return render(request, 'F_Tela_Cadastro_Chefe.html')
 
-    else:
-        # GET
-        return render(request, 'F_Tela_Cadastro_Chefe.html')
+    # GET
+    return render(request, 'F_Tela_Cadastro_Chefe.html')
+
 
 def cadastro_adm(request):
     # Sua lógica de solicitação (por enquanto, tudo bem)
@@ -205,17 +204,46 @@ def historia_chefe(request):
 # Views de Receitas (Antigo app 'receitas')
 # ----------------------------------------
 
+@login_required
 def cadastrar_receita(request):
-    # Você terá que reescrever esta view também,
-    # manualmente, como fizemos com o cadastro.
-    # Por enquanto, vamos apenas renderizar o template.
-    
-    # Lógica de sessão (se você ainda a usa)
-    ingredientes_ids = request.session.get('ingredientes_ids', [])
-    ingredientes = E_Ingrediente.objects.filter(id__in=ingredientes_ids)
-    contexto = {'ingredientes': ingredientes}
-    
-    return render(request, 'receita_form.html', contexto)
+    if request.method == 'POST':
+        try:
+            autor = E_Chefe.objects.get(usuario=request.user)
+            nome = request.POST.get('nome')
+            descricao = request.POST.get('descricao')
+            preco = request.POST.get('preco')
+            tag = request.POST.get('tag')
+            ingredientes_texto = request.POST.get('ingredientes', '')
+
+            # Criar receita
+            receita = E_Receita.objects.create(
+                autor=autor,
+                nome=nome,
+                descricao=descricao,
+                preco=preco,
+                tag=tag
+            )
+
+            # Processar ingredientes
+            ingredientes_lista = [i.strip() for i in ingredientes_texto.split(',') if i.strip()]
+            for nome_ingrediente in ingredientes_lista:
+                ingrediente, _ = E_Ingrediente.objects.get_or_create(nome=nome_ingrediente)
+                receita.ingredientes.add(ingrediente)
+
+            messages.success(request, 'Receita cadastrada com sucesso!')
+            return redirect('home')
+
+        except E_Chefe.DoesNotExist:
+            messages.error(request, "Você precisa ser um Chefe para cadastrar receitas.")
+            return redirect('home')
+
+        except Exception as e:
+            messages.error(request, f"Ocorreu um erro: {e}")
+
+    # GET → enviar tags pro template
+    return render(request, 'F_Tela_Cadastro_Receita.html', {
+        'tags': E_Receita.TAGS
+    })
 
 def cadastrar_ingredientes(request):
     # Esta view também precisa ser reescrita
