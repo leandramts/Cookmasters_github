@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .models import E_UsuarioGeral, E_Chefe, E_Consumidor, E_Receita, E_Ingrediente
+from .models import E_UsuarioGeral, E_Chefe, E_Consumidor, E_Receita, E_Ingrediente, E_Tag
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 
@@ -149,7 +149,8 @@ def cadastrar_receita(request):
             nome = request.POST.get('nome')
             descricao = request.POST.get('descricao')
             preco = request.POST.get('preco')
-            tag = request.POST.get('tag')
+            modo_de_preparo = request.POST.get('modo_de_preparo')
+            tags_selecionadas = request.POST.getlist('tags')
             ingredientes_texto = request.POST.get('ingredientes', '')
 
             # Criar receita
@@ -158,8 +159,13 @@ def cadastrar_receita(request):
                 nome=nome,
                 descricao=descricao,
                 preco=preco,
-                tag=tag
+                modo_de_preparo=modo_de_preparo
             )
+
+            # Adicionar tags
+            for nome_tag in tags_selecionadas:
+                tag, _ = E_Tag.objects.get_or_create(nome=nome_tag)
+                receita.tags.add(tag)
 
             # Processar ingredientes
             ingredientes_lista = [i.strip() for i in ingredientes_texto.split(',') if i.strip()]
@@ -177,7 +183,7 @@ def cadastrar_receita(request):
         except Exception as e:
             messages.error(request, f"Ocorreu um erro: {e}")
 
-    
+    # Passa as tags padrão para o HTML
     return render(request, 'F_Tela_Cadastro_Receita.html', {
-        'tags': E_Receita.TAGS
+        'tags': E_Receita.TAGS_PADRAO
     })

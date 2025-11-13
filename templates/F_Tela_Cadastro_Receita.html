@@ -12,31 +12,37 @@
                 {% endfor %}
             </ul>
         {% endif %}
-<form method="POST">
-    {% csrf_token %}
-    
-    <label>Nome da Receita:</label>
-    <input type="text" name="nome" required>
 
-    <label>Preço:</label>
-    <input type="number" step="0.01" name="preco" required>
+        <form method="POST">
+            {% csrf_token %}
+            
+            <label>Nome da Receita:</label>
+            <input type="text" name="nome" required>
 
-    <label>Descrição:</label>
-    <textarea name="descricao" required></textarea>
+            <label>Preço:</label>
+            <input type="number" step="0.01" name="preco" required>
 
-    <label>Tag:</label>
-    <select name="tag" multiple>
-        <option value="">-- Selecione --</option>
-        {% for valor, label in tags %}
-            <option value="{{ valor }}">{{ label }}</option>
-        {% endfor %}
-    </select>
+            <label>Descrição:</label>
+            <textarea name="descricao" required></textarea>
 
-    <label>Ingredientes (separe por vírgula):</label>
-    <input type="text" name="ingredientes">
+            <label>Modo de Preparo:</label>
+            <textarea name="modo_de_preparo" placeholder="Descreva o modo de preparo..." required></textarea>
 
-    <button type="submit">Cadastrar Receita</button>
-</form>
-</div>
+            <label>Tags:</label>
+            <div class="checkbox-group">
+                {% for tag in tags %}
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tag_{{ forloop.counter }}" name="tags" value="{{ tag }}">
+                        <label for="tag_{{ forloop.counter }}">{{ tag }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <label>Ingredientes (separe por vírgula):</label>
+            <input type="text" name="ingredientes">
+
+            <button type="submit">Cadastrar Receita</button>
+        </form>
+    </div>
 </div>
 {% endblock content %}
