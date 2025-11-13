@@ -1,4 +1,4 @@
-# Cookmasters_app/views.py
+
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
@@ -70,7 +70,6 @@ def cadastro_consumidor(request):
 
         try:
             user = E_UsuarioGeral.objects.create_user(
-                username = email,
                 email=email,
                 nome=nome,
                 password=senha
@@ -109,7 +108,6 @@ def cadastro_chefe(request):
         try:
 
             user = E_UsuarioGeral.objects.create_user(
-                username=email,
                 email=email,
                 nome=nome,
                 password=senha
@@ -132,13 +130,7 @@ def cadastro_chefe(request):
     return render(request, 'F_Tela_Cadastro_Chefe.html')
 
 
-def cadastro_adm(request):
- 
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        messages.info(request, f'Solicitação de acesso enviada para ({email}).')
-        return redirect('home')
-    return render(request, 'F_Tela_Cadastro_Adm.html')
+
  
 
 @login_required

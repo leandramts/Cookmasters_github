@@ -14,7 +14,6 @@ urlpatterns = [
     path('cadastro/', views.escolher_tipo_usuario, name='escolher_tipo'),
     path('cadastro/chefe/', views.cadastro_chefe, name='cadastro_chefe'),
     path('cadastro/consumidor/', views.cadastro_consumidor, name='cadastro_consumidor'),
-    path('cadastro/adm/', views.cadastro_adm, name='cadastro_adm'),
 
     # Rotas de Receitas
     path('receitas/cadastrar/', views.cadastrar_receita, name='cadastrar_receita'),
