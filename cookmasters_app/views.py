@@ -137,7 +137,7 @@ def cadastro_chefe(request):
             return render(request, 'F_Tela_Cadastro_Chefe.html')
 
         try:
-            # ✅ Corrigido: adicionando username=email
+
             user = E_UsuarioGeral.objects.create_user(
                 username=email,
                 email=email,
@@ -151,10 +151,9 @@ def cadastro_chefe(request):
                 cpf=cpf
             )
 
-            # ✅ Login automático
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f'Chefe {nome} cadastrado com sucesso!')
-            return redirect('historia_Chefe')
+            return redirect('home')
 
         except Exception as e:
             messages.error(request, f"Ocorreu um erro: {e}")

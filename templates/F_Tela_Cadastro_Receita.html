@@ -1,3 +1,17 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<div class="auth-page">
+    <div class="container-auth">
+        <h1>Cadastrar Nova Receita</h1>
+        
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
 <form method="POST">
     {% csrf_token %}
     
@@ -11,7 +25,7 @@
     <textarea name="descricao" required></textarea>
 
     <label>Tag:</label>
-    <select name="tag">
+    <select name="tag" multiple>
         <option value="">-- Selecione --</option>
         {% for valor, label in tags %}
             <option value="{{ valor }}">{{ label }}</option>
@@ -23,3 +37,6 @@
 
     <button type="submit">Cadastrar Receita</button>
 </form>
+</div>
+</div>
+{% endblock content %}

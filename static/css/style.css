@@ -6,20 +6,31 @@ nav {
 }
 
     .hom {
-        background-color: #f4ed93;
+        background-color: #eae168;
     }
+
+main {
+    
+    background-color: transparent; 
+    padding: 0; 
+}
+
+.home-bg {
+    background-color: #cafb96; 
+    padding: 20px;
+}
 
 
 
 nav a {
-    color: #feed00;
+    color: #f2e646;
     text-decoration: none; 
     margin-right: 20px;
     font-weight: bold;
 }
 
 nav :hover {
-    color: #21ce44;
+    color: #aee23e;
     
 }
 
@@ -27,7 +38,7 @@ nav :hover {
 
 .boas-vindas {
     text-align: center;
-    background-color: #9dcb6c;
+    background-color: #76b532;
     padding: 20px;
     border-radius: 8px;
 }
@@ -45,11 +56,11 @@ nav :hover {
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); 
-    background-color: rgb(241, 238, 71);
+    background-color: rgb(251, 209, 82);
 }
 
 .recipe-card h3 {
-    color: #09522b; 
+    color: #088341; 
 }
 
 .auth-page {
@@ -72,7 +83,7 @@ nav :hover {
     text-align: center;
 }
 
-/* O título laranja */
+/*O título laranja */
 .container-auth h1 {
     background-color: #e1a536;
     color: #333;
@@ -98,7 +109,7 @@ nav :hover {
     border: 1px solid #ccc;
     border-radius: 6px;
     margin-top: 5px;
-    box-sizing: border-box; /* Importante para o width 100% */
+    box-sizing: border-box;
 }
 
 .container-auth button,
@@ -131,7 +142,7 @@ nav :hover {
     margin: 0 0 15px 0;
 }
 .messages li.error {
-    color: red;
+    color: rgb(156, 245, 121);
     background: #fdd;
     padding: 5px;
     border-radius: 4px;

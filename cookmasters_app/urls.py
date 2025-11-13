@@ -15,7 +15,6 @@ urlpatterns = [
     path('cadastro/chefe/', views.cadastro_chefe, name='cadastro_chefe'),
     path('cadastro/consumidor/', views.cadastro_consumidor, name='cadastro_consumidor'),
     path('cadastro/adm/', views.cadastro_adm, name='cadastro_adm'),
-    path('chefe/historia/', views.historia_chefe, name='historia_chefe'),
 
     # Rotas de Receitas
     path('receitas/cadastrar/', views.cadastrar_receita, name='cadastrar_receita'),

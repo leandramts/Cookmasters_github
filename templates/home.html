@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
-
 {% block content %}
+
+<div class = "home-bg">
 
     <div class="boas-vindas">
         {% if user.is_authenticated %}
@@ -31,4 +32,5 @@
         {% endfor %}
     </div>
 
+</div>
 {% endblock %}
