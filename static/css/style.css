@@ -175,3 +175,42 @@ nav :hover {
     color: #888;
     font-style: italic;
 }
+
+.chefe-container-split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.chefe-info-esquerda {
+    flex: 1;
+    min-width: 300px;
+    text-align: left;
+}
+
+.chefe-receitas-direita {
+    flex: 1.5;
+    text-align: left;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding-right: 15px;
+}
+
+.container-auth .chefe-nome {
+    text-align: left;
+}
+
+.container-auth .chefe-secao-titulo {
+    text-align: left;
+}
+
+.recipe-card p a {
+    color: #088341; 
+    text-decoration: none; 
+    font-weight: bold;
+}
+
+.recipe-card p a:hover {
+    text-decoration: underline; 
+    color: #d46b08; 
+}

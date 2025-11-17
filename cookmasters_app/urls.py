@@ -17,4 +17,7 @@ urlpatterns = [
 
     # Rotas de Receitas
     path('receitas/cadastrar/', views.cadastrar_receita, name='cadastrar_receita'),
+
+    #Rotas de Visualizacao
+    path("chefe/<int:id>/", views.visualizar_chefe, name="visualizar_chefe"),
 ]

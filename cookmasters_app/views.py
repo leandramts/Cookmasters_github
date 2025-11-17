@@ -1,8 +1,9 @@
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from .models import E_UsuarioGeral, E_Chefe, E_Consumidor, E_Receita, E_Ingrediente, E_Tag
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
@@ -55,7 +56,7 @@ def cadastro_consumidor(request):
         email = request.POST.get('email')
         senha = request.POST.get('senha')
         senha_confirm = request.POST.get('senha_confirm')
-
+        
         if not nome or not email or not senha or not senha_confirm:
             messages.error(request, "Todos os campos são obrigatórios.")
             return render(request, 'F_Tela_Cadastro_Consumidor.html')
@@ -96,39 +97,53 @@ def cadastro_chefe(request):
         senha = request.POST.get('senha')
         senha_confirm = request.POST.get('senha_confirm')
         cpf = request.POST.get('cpf')
+        descricao = request.POST.get('descricao')
+
+        if not nome or not email or not senha or not senha_confirm or not cpf or not descricao:
+             messages.error(request, "Todos os campos são obrigatórios.")
+             return render(request, 'F_Tela_Cadastro_Chefe.html')
 
         if senha != senha_confirm:
             messages.error(request, "As senhas não são iguais.")
             return render(request, 'F_Tela_Cadastro_Chefe.html')
-
-        if not cpf:
-            messages.error(request, "O CPF é obrigatório para Chefes.")
+        
+        if E_UsuarioGeral.objects.filter(email=email).exists():
+            messages.error(request, "Este e-mail já está em uso.")
             return render(request, 'F_Tela_Cadastro_Chefe.html')
 
+
         try:
+            with transaction.atomic():
 
-            user = E_UsuarioGeral.objects.create_user(
-                email=email,
-                nome=nome,
-                password=senha
-            )
+                user = E_UsuarioGeral.objects.create_user(
+                    email=email,
+                    nome=nome,
+                    password=senha
+                )
 
-            E_Chefe.objects.create(
-                usuario=user,
-                cpf=cpf
-            )
+                E_Chefe.objects.create(
+                    usuario=user,
+                    cpf=cpf,
+                    descricao = descricao
+                )
 
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f'Chefe {nome} cadastrado com sucesso!')
             return redirect('home')
 
         except Exception as e:
-            messages.error(request, f"Ocorreu um erro: {e}")
-            return render(request, 'F_Tela_Cadastro_Chefe.html')
+                messages.error(request, f"Ocorreu um erro: {e}")
+                return render(request, 'F_Tela_Cadastro_Chefe.html')
 
-    # GET
+        # GET
     return render(request, 'F_Tela_Cadastro_Chefe.html')
 
+
+def visualizar_chefe(request, id):
+    chefe = get_object_or_404(E_Chefe, id=id)
+    receitas = E_Receita.objects.filter(autor=chefe)
+
+    return render(request, "F_Tela_Visualizar_Chefe.html", {"chefe":chefe, "receitas": receitas})
 
 
  

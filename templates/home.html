@@ -21,8 +21,12 @@
         {% for receita in receitas %}
             <div class="recipe-card">
                 <h3>{{ receita.nome }}</h3>
-                <p>Por: {{ receita.autor.usuario.nome }}</p>
-                <p>Nota: {{ receita.nota }} ★</p>
+<p>Por: 
+    <a href="{% url 'visualizar_chefe' receita.autor.id %}">
+        {{ receita.autor.usuario.nome }}
+    </a>
+</p>
+<p>Nota: {{ receita.nota }} ★</p>
                 <p>Preço: R$ {{ receita.preco }}</p>
 
                 <p><strong>Tags:</strong>
