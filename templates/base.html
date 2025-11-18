@@ -16,7 +16,9 @@
         <a href="{% url 'escolher_tipo' %}">Cadastra-se</a>
         
         <a href="{% url 'cadastrar_receita' %}">Cadastrar Receita</a>
-        
+
+        <a href="{% url 'cozinheme' %}">Cozinhe-me</a>
+
         {% if user.is_authenticated %}
             <a href="{% url 'logout' %}">Sair</a>
         {% endif %}

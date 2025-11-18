@@ -20,4 +20,5 @@ urlpatterns = [
 
     #Rotas de Visualizacao
     path("chefe/<int:id>/", views.visualizar_chefe, name="visualizar_chefe"),
+    path("cozinhe-me/", views.cozinhe_me, name='cozinheme')
 ]

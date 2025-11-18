@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from .models import E_UsuarioGeral, E_Chefe, E_Consumidor, E_Receita, E_Ingrediente, E_Tag
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-
+from django.db.models import Count,Q
 
 
 def home_view(request):
@@ -194,3 +194,37 @@ def cadastrar_receita(request):
     return render(request, 'F_Tela_Cadastro_Receita.html', {
         'tags': E_Receita.TAGS_PADRAO
     })
+
+def cozinhe_me(request):
+    # Lista completa de ingredientes, ordenados
+    ingredientes = E_Ingrediente.objects.all().order_by("nome")
+
+    # Ingredientes selecionados (vêm dos checkboxes)
+    selecionados_ids = request.POST.getlist("ingredientes")
+    ingredientes_selecionados = E_Ingrediente.objects.filter(id__in=selecionados_ids)
+
+    receitas = []
+
+    if ingredientes_selecionados:
+        # Receitas que possuam pelo menos um ingrediente selecionado
+        receitas_possiveis = (
+            E_Receita.objects
+            .filter(ingredientes__in=ingredientes_selecionados)
+            .distinct()
+        )
+
+        # Mantém somente receitas que NÃO possuam ingredientes fora da seleção
+        conjunto_selecionado = set(ingredientes_selecionados)
+
+        receitas = [
+            r for r in receitas_possiveis
+            if set(r.ingredientes.all()).issubset(conjunto_selecionado)
+        ]
+
+    context = {
+        "ingredientes": ingredientes,
+        "ingredientes_selecionados": ingredientes_selecionados,
+        "receitas": receitas,
+    }
+
+    return render(request, "F_Tela_CozinheMe.html", context)

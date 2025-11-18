@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="auth-page">
+    <div class="container-auth" style="width: 600px;">
+
+        <h1>Cozinhe-Me</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- INGREDIENTES -->
+            <label style="margin-top: 20px;">Escolha os Ingredientes:</label>
+
+            <div class="checkbox-group" style="
+                background-color: #fff3b0;
+                padding: 15px;
+                border-radius: 10px;
+                border: 1px solid #e0d887;
+                max-height: 250px;
+                overflow-y: auto;
+            ">
+                {% for ing in ingredientes %}
+                    <label class="checkbox-item" style="
+                        background-color: #f9f2c7;
+                        padding: 5px 10px;
+                        border-radius: 8px;
+                        border: 1px solid #ddd;
+                        cursor: pointer;
+                    ">
+                        <input 
+                            type="checkbox" 
+                            name="ingredientes" 
+                            value="{{ ing.id }}"
+                            {% if ing in ingredientes_selecionados %}checked{% endif %}
+                            onchange="this.form.submit()"
+                        >
+                        {{ ing.nome }}
+                    </label>
+                {% endfor %}
+            </div>
+
+            <!-- SELECIONADOS -->
+            <label style="margin-top: 20px;">Ingredientes Selecionados:</label>
+            <div style="
+                background-color: #e6ffbf;
+                padding: 10px 15px;
+                border-radius: 10px;
+                border: 1px solid #b0d98a;
+                min-height: 50px;
+            ">
+                {% for ing in ingredientes_selecionados %}
+                    <span class="tag">{{ ing.nome }}</span>
+                {% empty %}
+                    <span class="no-tag">Nenhum ingrediente selecionado.</span>
+                {% endfor %}
+            </div>
+
+            <!-- RECEITAS -->
+            <label style="margin-top: 25px;">Receitas Compatíveis:</label>
+
+            <div style="
+                background-color: #fff9cc;
+                border-radius: 10px;
+                padding: 15px;
+                border: 1px solid #e0d271;
+                max-height: 300px;
+                overflow-y: auto;
+            ">
+                {% for receita in receitas %}
+                    <div class="recipe-card" style="margin-bottom: 10px;">
+                        <h3>{{ receita.nome }}</h3>
+                        <p><strong>Autor:</strong> {{ receita.autor.usuario.nome }}</p>
+                        <p>
+                            <strong>Ingredientes:</strong><br>
+                            {% for ing in receita.ingredientes.all %}
+                                <span class="tag">{{ ing.nome }}</span>
+                            {% endfor %}
+                        </p>
+                    </div>
+                {% empty %}
+                    {% if ingredientes_selecionados %}
+                        <p>Nenhuma receita encontrada com exatamente esses ingredientes.</p>
+                    {% else %}
+                        <p>Selecione ingredientes para ver receitas disponíveis.</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}
