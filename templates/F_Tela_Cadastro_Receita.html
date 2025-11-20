@@ -4,6 +4,7 @@
 <div class="auth-page">
     <div class="container-auth">
         <h1>Cadastrar Nova Receita</h1>
+
         
         {% if messages %}
             <ul class="messages">
@@ -13,7 +14,7 @@
             </ul>
         {% endif %}
 
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             
             <label>Nome da Receita:</label>
@@ -40,9 +41,22 @@
 
             <label>Ingredientes (separe por vírgula):</label>
             <input type="text" name="ingredientes">
+            <label for="foto_receita">Foto da Receita:</label>
+            <input type="file" name="foto_receita" id="foto_receita" accept="image/*">
+
+            <label>Tempo de Preparo (minutos):</label>
+<input type="number" name="tempo_preparo" min="1" required>
+            <label>Nível de Dificuldade:</label>
+<select name="dificuldade" required>
+    <option value="facil">Fácil</option>
+    <option value="medio">Médio</option>
+    <option value="dificil">Difícil</option>
+</select>
+
+
+
 
             <button type="submit">Cadastrar Receita</button>
         </form>
-    </div>
 </div>
 {% endblock content %}

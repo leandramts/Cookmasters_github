@@ -130,3 +130,7 @@ AUTH_USER_MODEL = 'cookmasters_app.E_UsuarioGeral'
 LOGIN_REDIRECT_URL = 'home'
 
 LOGOUT_REDIRECT_URL = 'home'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = BASE_DIR / 'media'

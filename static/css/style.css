@@ -214,3 +214,14 @@ nav :hover {
     text-decoration: underline; 
     color: #d46b08; 
 }
+
+.chefe-foto {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 50%;
+    border-radius: 12px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border: 2px solid #ddd;
+}

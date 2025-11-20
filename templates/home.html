@@ -28,6 +28,11 @@
 </p>
 <p>Nota: {{ receita.nota }} ★</p>
                 <p>Preço: R$ {{ receita.preco }}</p>
+                
+                <p><strong>Tempo de Preparo:</strong> {{ receita.tempo_preparo }} minutos</p>
+                <p><strong>Dificuldade:</strong> {{ receita.dificuldade|capfirst }}</p> 
+                <p>Nota: {{ receita.nota }} ★</p>
+                <p>Preço: R$ {{ receita.preco }}</p>
 
                 <p><strong>Tags:</strong>
                     {% if receita.tags.all %}

@@ -20,6 +20,10 @@
                 
                 <h1 class="chefe-nome">{{ chefe.usuario.nome }}</h1>
 
+                {% if chefe.foto %}
+    <img src="{{ chefe.foto.url }}" alt="Foto do Chefe" class="chefe-foto">
+{% endif %}
+
                 <p><strong>Nota geral:</strong> {{ chefe.Nota }}</p>
 
                 <h2 class="chefe-secao-titulo">Sobre o Chef</h2>

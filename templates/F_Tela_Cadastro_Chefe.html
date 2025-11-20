@@ -5,7 +5,7 @@
     <div class="container-auth">
         <h1>Cadastro de Chefe</h1>
         
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
             {% if messages %}
@@ -32,6 +32,8 @@
             <input type="password" name="senha_confirm" id="senha_confirm" required>
             <label for ="descricao">Sua hitória:</label>
             <textarea name="descricao" id="descricao" rows="5" placeholder="Conte um pouco sobre você, sua experiência e trajetória como chefe"required></textarea>
+            <label for="foto">Foto de Perfil:</label>
+            <input type="file" name="foto" id="foto" accept="image/*">
             <button type="submit">Cadastrar Chefe</button>
         </form>
     </div>

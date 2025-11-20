@@ -44,11 +44,12 @@ class E_Chefe(models.Model):
     usuario = models.OneToOneField(E_UsuarioGeral, on_delete=models.CASCADE)
 
     cpf = models.CharField(max_length=14, unique=True)
-    numero_agencia = models.CharField(max_length=10)
-    nome_do_banco = models.CharField(max_length=30)
-    descricao = models.TextField(blank=True)
+    numero_agencia = models.CharField(max_length=10, blank=True, null=True)
+    nome_do_banco = models.CharField(max_length=30, blank=True, null=True)
+    descricao = models.TextField(blank=True, null=True)
     Nota = models.FloatField(default=0.0)
-    Numero_conta = models.CharField(max_length=50)
+    Numero_conta = models.CharField(max_length=50, blank=True, null=True)
+    foto = models.ImageField(upload_to='fotos_chefes', blank=True, null=True)
 
     def __str__(self):
         return self.usuario.email
@@ -83,9 +84,23 @@ class E_Receita(models.Model):
     preco = models.DecimalField(max_digits=6, decimal_places=2)
     descricao = models.TextField()
     modo_de_preparo = models.TextField(default="Sem modo de preparo informado")
+    tempo_preparo = models.IntegerField(default=0)
+    DIFICULDADE_CHOICES = [
+            ('facil', 'Fácil'),
+            ('medio', 'Médio'),
+            ('dificil', 'Difícil'),
+        ]
+
+    dificuldade = models.CharField(
+            max_length=10,
+            choices=DIFICULDADE_CHOICES,
+            default='facil'
+        )
+
     nota = models.IntegerField(default=0)
     tags = models.ManyToManyField(E_Tag, related_name='receitas', blank=True)
     ingredientes = models.ManyToManyField('E_Ingrediente', related_name='receitas')
+    foto = models.ImageField(upload_to='fotos_receitas', blank=True, null=True)
 
     def __str__(self):
         return self.nome

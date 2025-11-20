@@ -98,6 +98,7 @@ def cadastro_chefe(request):
         senha_confirm = request.POST.get('senha_confirm')
         cpf = request.POST.get('cpf')
         descricao = request.POST.get('descricao')
+        foto = request.FILES.get('foto')
 
         if not nome or not email or not senha or not senha_confirm or not cpf or not descricao:
              messages.error(request, "Todos os campos são obrigatórios.")
@@ -124,7 +125,8 @@ def cadastro_chefe(request):
                 E_Chefe.objects.create(
                     usuario=user,
                     cpf=cpf,
-                    descricao = descricao
+                    descricao = descricao,
+                    foto = foto
                 )
 
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
@@ -159,6 +161,10 @@ def cadastrar_receita(request):
             modo_de_preparo = request.POST.get('modo_de_preparo')
             tags_selecionadas = request.POST.getlist('tags')
             ingredientes_texto = request.POST.get('ingredientes', '')
+            tempo_preparo = request.POST.get('tempo_preparo')
+            dificuldade = request.POST.get('dificuldade')
+            foto = request.FILES.get('foto_receita')
+
 
             # Criar receita
             receita = E_Receita.objects.create(
@@ -166,7 +172,11 @@ def cadastrar_receita(request):
                 nome=nome,
                 descricao=descricao,
                 preco=preco,
-                modo_de_preparo=modo_de_preparo
+                modo_de_preparo=modo_de_preparo,
+                foto=foto,
+                tempo_preparo = tempo_preparo,
+                dificuldade = dificuldade
+
             )
 
             # Adicionar tags
