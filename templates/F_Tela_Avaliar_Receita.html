@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="home-bg">
+    <div class="container-auth" style="max-width: 500px; margin: 0 auto;">
+        <h2>Avaliar receita: {{ receita.nome }}</h2>
+
+        <form method="POST" action="{% url 'avaliar_receita' receita.id %}">
+            {% csrf_token %}
+
+            <label>Nota (1 a 5):</label>
+            <select name="nota" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+
+            <br><br>
+
+            <label>Comentário:</label><br>
+            <textarea name="comentario" rows="3"></textarea>
+
+            <br><br>
+
+            <button type="submit" class="botao-link" style="background:#088341; color:white;">
+                Enviar Avaliação
+            </button>
+        </form>
+
+        <br>
+        <a href="{% url 'visualizar_receita' receita.id %}" class="botao-link">Voltar</a>
+    </div>
+</div>
+{% endblock %}

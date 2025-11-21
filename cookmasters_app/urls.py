@@ -17,6 +17,11 @@ urlpatterns = [
 
     # Rotas de Receitas
     path('receitas/cadastrar/', views.cadastrar_receita, name='cadastrar_receita'),
+    path('receitas/visualizar/<int:receita_id>/', views.visualizar_receita, name='visualizar_receita'),
+    path("receita/<int:receita_id>/comprar/", views.comprar_receita, name="comprar_receita"),
+    path('receitas/<int:receita_id>/pagamento/', views.selecionar_pagamento, name='selecionar_pagamento'),
+    path("receitas/<int:receita_id>/avaliar/", views.avaliar_receita, name="avaliar_receita"),
+
 
     #Rotas de Visualizacao
     path("chefe/<int:id>/", views.visualizar_chefe, name="visualizar_chefe"),

@@ -52,7 +52,7 @@ class E_Chefe(models.Model):
     foto = models.ImageField(upload_to='fotos_chefes', blank=True, null=True)
 
     def __str__(self):
-        return self.usuario.email
+        return self.usuario.nome
 
 class E_Consumidor(models.Model):
     usuario = models.OneToOneField(E_UsuarioGeral, on_delete=models.CASCADE)
@@ -109,12 +109,40 @@ class E_Receita(models.Model):
 
 class E_Avaliacoes(models.Model):
     receita = models.ForeignKey(E_Receita, on_delete=models.CASCADE)
-    consumidor = models.ForeignKey(E_UsuarioGeral, on_delete=models.CASCADE)
-    nota = models.IntegerField() # Ex: de 1 a 5
+    consumidor = models.ForeignKey(E_Consumidor, on_delete=models.CASCADE)
+    nota = models.IntegerField()  # 1 a 5
     comentario = models.TextField(blank=True)
 
+
 class E_Pagamento(models.Model):
+
+    TIPO_PAGAMENTO_CHOICES = [
+        ('pix', 'PIX'),
+        ('credito', 'Cartão de Crédito'),
+        ('debito', 'Cartão de Débito'),
+    ]
+
     consumidor = models.ForeignKey(E_Consumidor, on_delete=models.SET_NULL, null=True)
-    tipo_pagamento = models.CharField(max_length=50) 
+
+    tipo_pagamento = models.CharField(
+        max_length=20,
+        choices=TIPO_PAGAMENTO_CHOICES,
+        default='pix'
+    )
+
     preco_total = models.DecimalField(max_digits=7, decimal_places=2)
     taxa_adm = models.DecimalField(max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.get_tipo_pagamento_display()} - R$ {self.preco_total}"
+
+
+class E_Compra(models.Model):
+    consumidor = models.ForeignKey(E_Consumidor, on_delete=models.CASCADE)
+    receita = models.ForeignKey(E_Receita, on_delete=models.CASCADE)
+    pagamento = models.ForeignKey(E_Pagamento, on_delete=models.CASCADE, null=True)
+
+    data_compra = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.consumidor.usuario.username} comprou {self.receita.nome}"

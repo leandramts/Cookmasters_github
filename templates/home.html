@@ -20,7 +20,13 @@
     <div class="recipe-grid">
         {% for receita in receitas %}
             <div class="recipe-card">
-                <h3>{{ receita.nome }}</h3>
+                <h3>
+                    <a href="{% url 'visualizar_receita' receita.id %}" style="color:#088341; text-decoration:none;">
+                        {{ receita.nome }}
+                    </a>
+                </h3>
+
+
 <p>Por: 
     <a href="{% url 'visualizar_chefe' receita.autor.id %}">
         {{ receita.autor.usuario.nome }}

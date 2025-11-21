@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="home-bg">
+
+    <div class="container-auth" style="max-width: 600px; margin: 0 auto;">
+
+        <h1 style="background:#e1a536; padding:10px; border-radius:10px;">
+            Escolher Pagamento
+        </h1>
+
+        <p><strong>Receita:</strong> {{ receita.nome }}</p>
+        <p><strong>Preço:</strong> R$ {{ preco }}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>Método de Pagamento:</label>
+            <select name="tipo_pagamento" class="form-control" style="padding:10px; width:100%; border-radius:8px;">
+                <option value="pix">PIX</option>
+                <option value="credito">Cartão de Crédito</option>
+                <option value="debito">Cartão de Débito</option>
+            </select>
+
+            <button type="submit" class="botao-link" style="margin-top:25px;">
+                Finalizar Pagamento
+            </button>
+        </form>
+
+        <a href="{% url 'visualizar_receita' receita.id %}" 
+           class="botao-link" 
+           style="background:#fdd; margin-top:15px;">
+           Cancelar
+        </a>
+
+    </div>
+
+</div>
+{% endblock %}

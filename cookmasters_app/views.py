@@ -4,9 +4,11 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from .models import E_UsuarioGeral, E_Chefe, E_Consumidor, E_Receita, E_Ingrediente, E_Tag
+from .models import E_UsuarioGeral, E_Chefe, E_Consumidor, E_Receita, E_Ingrediente, E_Tag, E_Compra, E_Pagamento, E_Avaliacoes
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import Count,Q
+from decimal import Decimal
+from django.db.models import Avg
 
 
 def home_view(request):
@@ -238,3 +240,159 @@ def cozinhe_me(request):
     }
 
     return render(request, "F_Tela_CozinheMe.html", context)
+
+def visualizar_receita(request, receita_id):
+    receita = get_object_or_404(E_Receita, id=receita_id)
+
+    modo_liberado = False
+    avaliou = False
+
+    consumidor = None
+
+    if request.user.is_authenticated:
+        consumidor = E_Consumidor.objects.filter(usuario=request.user).first()
+
+        if consumidor:
+            # Verifica se comprou
+            modo_liberado = E_Compra.objects.filter(
+                consumidor=consumidor,
+                receita=receita
+            ).exists()
+
+            # Verifica se já avaliou
+            avaliou = E_Avaliacoes.objects.filter(
+                consumidor=consumidor,   # ✅ AGORA ESTÁ CORRETO
+                receita=receita
+            ).exists()
+
+    contexto = {
+        'receita': receita,
+        'autor': receita.autor,
+        'nome': receita.nome,
+        'preco': receita.preco,
+        'descricao': receita.descricao,
+        'modo_de_preparo': receita.modo_de_preparo,
+        'tempo_preparo': receita.tempo_preparo,
+        'dificuldade': receita.get_dificuldade_display(),
+        'nota': receita.nota,
+        'tags': receita.tags.all(),
+        'ingredientes': receita.ingredientes.all(),
+        'foto': receita.foto.url if receita.foto else None,
+        'modo_liberado': modo_liberado,
+        'avaliou': avaliou,
+    }
+
+    return render(request, 'F_Tela_Visualizar_Receita.html', contexto)
+
+
+
+
+@login_required
+def comprar_receita(request, receita_id):
+    receita = get_object_or_404(E_Receita, id=receita_id)
+
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar receitas.")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    if E_Compra.objects.filter(consumidor=consumidor, receita=receita).exists():
+        messages.info(request, "Você já comprou esta receita.")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    E_Compra.objects.create(consumidor=consumidor, receita=receita)
+
+    messages.success(request, "Compra realizada! Modo de preparo liberado.")
+    return redirect("visualizar_receita", receita_id=receita_id)
+
+
+
+
+@login_required
+def selecionar_pagamento(request, receita_id):
+    receita = get_object_or_404(E_Receita, id=receita_id)
+
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar.")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    if request.method == "POST":
+        metodo = request.POST.get("tipo_pagamento")
+
+        if metodo not in ["pix", "credito", "debito"]:
+            messages.error(request, "Método de pagamento inválido.")
+            return redirect("selecionar_pagamento", receita_id=receita_id)
+
+        taxa_adm = receita.preco * Decimal("0.10")
+
+        pagamento = E_Pagamento.objects.create(
+            consumidor=consumidor,
+            tipo_pagamento=metodo,
+            preco_total=receita.preco,
+            taxa_adm=taxa_adm,
+        )
+
+        E_Compra.objects.create(
+            consumidor=consumidor,
+            receita=receita,
+            pagamento=pagamento
+        )
+
+        messages.success(request, "Pagamento realizado com sucesso!")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    return render(request, "F_Tela_Pagamento.html", {
+        "receita": receita,
+        "preco": receita.preco,
+    })
+
+@login_required
+def avaliar_receita(request, receita_id):
+    receita = get_object_or_404(E_Receita, id=receita_id)
+
+    # só consumidor pode avaliar
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem avaliar receitas.")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    # Só avalia se comprou
+    if not E_Compra.objects.filter(consumidor=consumidor, receita=receita).exists():
+        messages.error(request, "Você precisa comprar para avaliar esta receita.")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    # POST = enviar avaliação
+    if request.method == "POST":
+        nota = int(request.POST.get("nota"))
+        comentario = request.POST.get("comentario", "")
+
+        # Impedir avaliação duplicada
+        if E_Avaliacoes.objects.filter(consumidor=consumidor, receita=receita).exists():
+            messages.error(request, "Você já avaliou esta receita.")
+            return redirect("visualizar_receita", receita_id=receita_id)
+
+        E_Avaliacoes.objects.create(
+            receita=receita,
+            consumidor=consumidor,
+            nota=nota,
+            comentario=comentario
+        )
+
+        # Atualizar nota média da receita
+        from django.db.models import Avg
+        media = E_Avaliacoes.objects.filter(receita=receita).aggregate(avg=Avg('nota'))['avg']
+        receita.nota = media
+        receita.save()
+
+        messages.success(request, "Avaliação registrada com sucesso!")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    # GET = mostrar formulário de avaliação
+    return render(request, "F_Tela_Avaliar_Receita.html", {
+        "receita": receita
+    })
+

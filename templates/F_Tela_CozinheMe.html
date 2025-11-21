@@ -69,7 +69,11 @@
             ">
                 {% for receita in receitas %}
                     <div class="recipe-card" style="margin-bottom: 10px;">
-                        <h3>{{ receita.nome }}</h3>
+                        <h3>
+                            <a href="{% url 'visualizar_receita' receita.id %}" style="color:#088341; text-decoration:none;">
+                                {{ receita.nome }}
+                            </a>
+                        </h3>
                         <p><strong>Autor:</strong> {{ receita.autor.usuario.nome }}</p>
                         <p>
                             <strong>Ingredientes:</strong><br>

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="home-bg">
+
+    <div class="container-auth" style="max-width: 700px; margin: 0 auto;">
+
+        <!-- Nome da receita -->
+        <h1>{{ nome }}</h1>
+
+        <!-- Foto -->
+        {% if foto %}
+            <img src="{{ foto }}" 
+                 alt="Foto da receita"
+                 style="width: 100%; border-radius: 12px; margin-bottom: 20px;">
+        {% endif %}
+
+        <hr style="margin: 20px 0;">
+
+        <!-- Informações principais -->
+        <p><strong>Autor:</strong> {{ autor }}</p>
+        <p><strong>Preço:</strong> R$ {{ preco }}</p>
+        <p><strong>Descrição:</strong><br> {{ descricao }}</p>
+
+        <hr style="margin: 20px 0;">
+
+        <!-- MODO DE PREPARO -->
+        {% if modo_liberado %}
+            <p><strong>Modo de preparo:</strong><br> {{ modo_de_preparo }}</p>
+        {% else %}
+            <p><strong>Modo de preparo:</strong><br> 
+                <span style="color: grey; font-style: italic;">
+                    Compre a receita para visualizar o modo de preparo.
+                </span>
+            </p>
+
+            <!-- BOTÃO DE COMPRAR -->
+            <form method="POST" action="{% url 'selecionar_pagamento' receita.id %}">
+                {% csrf_token %}
+                <button class="botao-link" type="submit" style="margin-top: 15px;">
+                    Comprar por R$ {{ preco }}
+                </button>
+            </form>
+        {% endif %}
+
+        <hr style="margin: 20px 0;">
+
+        <p><strong>Tempo de preparo:</strong> {{ tempo_preparo }} min</p>
+        <p><strong>Dificuldade:</strong> {{ dificuldade }}</p>
+        <p><strong>Nota:</strong> {{ nota }}/5</p>
+
+        <hr style="margin: 20px 0;">
+
+        <!-- Ingredientes -->
+        <h3 style="color:#088341; text-align:left;">Ingredientes</h3>
+        <ul>
+            {% for i in ingredientes %}
+                <li>{{ i.nome }}</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Tags -->
+        <h3 style="color:#088341; text-align:left; margin-top:20px;">Tags</h3>
+        {% if tags %}
+            {% for tag in tags %}
+                <span class="tag">{{ tag.nome }}</span>
+            {% endfor %}
+        {% else %}
+            <p class="no-tag">Nenhuma tag informada</p>
+        {% endif %}
+
+        <br><br>
+
+        <!-- ⭐ Avaliações (visíveis para todos) ⭐ -->
+        <hr>
+        <h3 style="color:#088341;">Avaliações</h3>
+        {% for avaliacao in receita.e_avaliacoes_set.all %}
+            <div style="margin-bottom: 10px; padding:10px; background:#f5fff5; border-radius:8px;">
+                <strong>{{ avaliacao.consumidor.usuario.nome }}</strong> — Nota: {{ avaliacao.nota }}/5
+                <p>{{ avaliacao.comentario }}</p>
+            </div>
+        {% empty %}
+            <p>Nenhuma avaliação ainda.</p>
+        {% endfor %}
+
+        <!-- Botão para avaliar (só aparece se comprou e ainda não avaliou) -->
+        {% if modo_liberado and not avaliou %}
+            <form method="GET" action="{% url 'avaliar_receita' receita.id %}">
+                <button type="submit" class="botao-link" style="margin-top: 15px;">
+                    Avaliar receita
+                </button>
+            </form>
+        {% elif avaliou %}
+            <p><strong>Você já avaliou esta receita.</strong></p>
+        {% endif %}
+
+        <!-- Botão voltar -->
+        <a href="{% url 'home' %}" class="botao-link" style="margin-top: 25px;">
+            Voltar
+        </a>
+
+    </div>
+
+</div>
+{% endblock %}
