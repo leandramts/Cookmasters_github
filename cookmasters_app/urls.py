@@ -5,6 +5,8 @@ from . import views # Importa o seu views.py gigante
 urlpatterns = [
     # Rotas da Home
     path('', views.home_view, name='home'),
+    path('filtro/', views.filtro, name='filtro'),
+
 
     # Rotas de Autenticação
     path('login/', views.login_view, name='login'),

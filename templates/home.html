@@ -15,6 +15,50 @@
 
     <hr>
 
+    <div class="filtro-box">
+
+        <form method="GET" action="{% url 'filtro' %}">
+            
+            <!-- DIFICULDADE -->
+            <label><strong>Dificuldade:</strong></label>
+            <select name="dificuldade">
+                <option value="" {% if selecionada_dificuldade == "" %}selected{% endif %}>Todas</option>
+                <option value="facil" {% if selecionada_dificuldade == "facil" %}selected{% endif %}>Fácil</option>
+                <option value="medio" {% if selecionada_dificuldade == "medio" %}selected{% endif %}>Médio</option>
+                <option value="dificil" {% if selecionada_dificuldade == "dificil" %}selected{% endif %}>Difícil</option>
+            </select>
+
+            <!-- TEMPO -->
+            <label><strong>Tempo de Preparo:</strong></label>
+            <select name="tempo">
+                <option value="" {% if selecionado_tempo == "" %}selected{% endif %}>Qualquer tempo</option>
+                <option value="1" {% if selecionado_tempo == "1" %}selected{% endif %}>Até 15 min</option>
+                <option value="2" {% if selecionado_tempo == "2" %}selected{% endif %}>15 a 30 min</option>
+                <option value="3" {% if selecionado_tempo == "3" %}selected{% endif %}>30 a 60 min</option>
+                <option value="4" {% if selecionado_tempo == "4" %}selected{% endif %}>Mais de 60 min</option>
+            </select>
+
+            <!-- TAGS -->
+            <label><strong>Tags:</strong></label>
+            <div class="tag-box">
+                {% for tag in todas_tags %}
+                    <label>
+                        <input type="checkbox"
+                               name="tags"
+                               value="{{ tag.id }}"
+                               {% if tag.id|stringformat:"s" in selecionadas_tags %}checked{% endif %}>
+                        {{ tag.nome }}
+                    </label>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn-filtrar">Filtrar</button>
+
+        </form>
+    </div>
+
+    <hr>
+
     <h2>Receitas em Destaque</h2>
 
     <div class="recipe-grid">

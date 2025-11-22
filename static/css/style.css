@@ -225,3 +225,40 @@ nav :hover {
     margin-bottom: 20px;
     border: 2px solid #ddd;
 }
+
+.filtro-box {
+    width: 250px;
+    padding: 15px;
+    background: #feee8a;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.filtro-box label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.filtro-box select,
+.filtro-box button {
+    width: 100%;
+    padding: 6px;
+    margin-top: 5px;
+}
+
+.tag-box label {
+    display: block;
+    margin-left: 5px;
+    font-weight: normal;
+}
+
+.btn-filtrar {
+    margin-top: 15px;
+    padding: 8px;
+    background-color: #f3a921;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}

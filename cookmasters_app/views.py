@@ -10,15 +10,19 @@ from django.db.models import Count,Q
 from decimal import Decimal
 from django.db.models import Avg
 
-
+# Home, nossa pagina inicial
 def home_view(request):
     receitas_em_destaque = E_Receita.objects.order_by('-nota')[:6]
-    contexto = {
-        'receitas': receitas_em_destaque
-    }
-    return render(request, 'home.html', contexto)
+    todas_tags = E_Tag.objects.all()  
 
-
+    return render(request, 'home.html', {
+        'receitas': receitas_em_destaque,
+        'todas_tags': todas_tags,
+        'selecionada_dificuldade': "",
+        'selecionado_tempo': "",
+        'selecionadas_tags': [],
+    })
+#UC01 - Fazer Login
 def login_view(request):
 
     if request.method == 'POST':
@@ -45,11 +49,14 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
-
+#UC00 - Cadastrar
 
 def escolher_tipo_usuario(request):
 
     return render(request, 'F_Tela_Escolher_Tipo.html')
+
+#UC00 - Cadastrar - quando for consumidor
+
 
 def cadastro_consumidor(request):
 
@@ -91,6 +98,7 @@ def cadastro_consumidor(request):
     else:
         return render(request, 'F_Tela_Cadastro_Consumidor.html')
 
+#UC00 - Cadastrar - quando for Chefe
 def cadastro_chefe(request):
 
     if request.method == 'POST':
@@ -142,6 +150,7 @@ def cadastro_chefe(request):
         # GET
     return render(request, 'F_Tela_Cadastro_Chefe.html')
 
+#UC03 - Visualizar Chefe
 
 def visualizar_chefe(request, id):
     chefe = get_object_or_404(E_Chefe, id=id)
@@ -150,7 +159,7 @@ def visualizar_chefe(request, id):
     return render(request, "F_Tela_Visualizar_Chefe.html", {"chefe":chefe, "receitas": receitas})
 
 
- 
+ #UC15 - Publicar Receitas
 
 @login_required
 def cadastrar_receita(request):
@@ -207,6 +216,8 @@ def cadastrar_receita(request):
         'tags': E_Receita.TAGS_PADRAO
     })
 
+# UC04 - Selecionar Ingredientes
+
 def cozinhe_me(request):
     # Lista completa de ingredientes, ordenados
     ingredientes = E_Ingrediente.objects.all().order_by("nome")
@@ -240,6 +251,8 @@ def cozinhe_me(request):
     }
 
     return render(request, "F_Tela_CozinheMe.html", context)
+
+# UC02 - Visualizar Receita
 
 def visualizar_receita(request, receita_id):
     receita = get_object_or_404(E_Receita, id=receita_id)
@@ -285,7 +298,7 @@ def visualizar_receita(request, receita_id):
     return render(request, 'F_Tela_Visualizar_Receita.html', contexto)
 
 
-
+#UC05 - Comprar Receitas
 
 @login_required
 def comprar_receita(request, receita_id):
@@ -307,7 +320,7 @@ def comprar_receita(request, receita_id):
     return redirect("visualizar_receita", receita_id=receita_id)
 
 
-
+#UC07 - Processar Pagamentos de Compras
 
 @login_required
 def selecionar_pagamento(request, receita_id):
@@ -348,6 +361,8 @@ def selecionar_pagamento(request, receita_id):
         "receita": receita,
         "preco": receita.preco,
     })
+
+#UC06 - Deixar avaliações
 
 @login_required
 def avaliar_receita(request, receita_id):
@@ -396,3 +411,45 @@ def avaliar_receita(request, receita_id):
         "receita": receita
     })
 
+#UC09 - Acessar Receitas Por Filtro
+def filtro(request):
+    dificuldade = request.GET.get('dificuldade', '')
+    tempo_preparo = request.GET.get('tempo', '')
+    tags = request.GET.getlist('tags')
+
+    receitas = E_Receita.objects.all()
+    todas_tags = E_Tag.objects.all()
+    if dificuldade:
+        receitas = receitas.filter(dificuldade=dificuldade)
+    
+    match tempo_preparo:
+        case "1":
+            receitas = receitas.filter(tempo_preparo__lte=15)
+
+        case "2":
+            receitas = receitas.filter(tempo_preparo__gte=15, tempo_preparo__lte=30)
+
+        case "3":
+            receitas = receitas.filter(tempo_preparo__gte=30, tempo_preparo__lte=60)
+
+        case "4":
+            receitas = receitas.filter(tempo_preparo__gte=60)
+
+        case _:
+            pass  
+
+    if tags:
+        for tag_id in tags:
+            receitas = receitas.filter(tags__id=tag_id)
+
+    todas_tags = E_Tag.objects.all()
+
+    return render (request, 'home.html', 
+    {
+        'receitas': receitas,
+        'todas_tags': todas_tags,
+        'selecionada_dificuldade': dificuldade,
+        'selecionado_tempo': tempo_preparo,
+        'selecionadas_tags': tags,
+
+    })
