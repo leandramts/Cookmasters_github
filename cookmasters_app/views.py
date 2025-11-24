@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from .models import E_UsuarioGeral, E_Chefe, E_Consumidor, E_Receita, E_Ingrediente, E_Tag, E_Compra, E_Pagamento, E_Avaliacoes
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db.models import Count,Q
+from django.db.models import Count,Q, Sum, F, ExpressionWrapper, DecimalField
 from decimal import Decimal
 from django.db.models import Avg
 
@@ -453,3 +453,135 @@ def filtro(request):
         'selecionadas_tags': tags,
 
     })
+
+# UC16 - Gerar Relatório de Vendas para Chefe
+@login_required
+def relatorio_vendas_chefe(request):
+    try:
+        chefe = E_Chefe.objects.get(usuario=request.user)
+    except E_Chefe.DoesNotExist:
+        messages.error(request, "Acesso negado. Apenas Chefes podem visualizar relatórios de vendas.")
+        return redirect('home')
+
+    TAXA_ADM = Decimal("0.10")
+    
+    relatorio = E_Receita.objects.filter(autor=chefe).annotate(
+        total_vendas=Count('vendas'),
+        receita_bruta=Sum('preco', default=Decimal(0)), # Preço total de todas as vendas
+        
+
+        taxa_deduzida=ExpressionWrapper(
+            F('receita_bruta') * TAXA_ADM,
+            output_field=DecimalField(decimal_places=2)
+        ),
+        
+        receita_liquida=ExpressionWrapper(
+            F('receita_bruta') - (F('receita_bruta') * TAXA_ADM),
+            output_field=DecimalField(decimal_places=2)
+        )
+    ).order_by('-total_vendas')
+
+    # Filtra para mostrar apenas receitas que tiveram vendas
+    receitas_com_vendas = relatorio.exclude(total_vendas=0)
+    
+    # Cálculos totais (gerais do chefe)
+    total_vendas_geral = receitas_com_vendas.aggregate(Sum('total_vendas'))['total_vendas__sum'] or 0
+    receita_bruta_geral = receitas_com_vendas.aggregate(Sum('receita_bruta'))['receita_bruta__sum'] or Decimal(0)
+    receita_liquida_geral = receitas_com_vendas.aggregate(Sum('receita_liquida'))['receita_liquida__sum'] or Decimal(0)
+
+
+    context = {
+        'chefe': chefe,
+        'relatorio': receitas_com_vendas,
+        'total_vendas_geral': total_vendas_geral,
+        'receita_bruta_geral': receita_bruta_geral,
+        'receita_liquida_geral': receita_liquida_geral,
+        'receitas_sem_vendas': relatorio.filter(total_vendas=0).count(),
+    }
+
+    return render(request, 'F_Tela_Relatorio_Vendas.html', context)
+
+
+#UC17 - Editar/Excluir Receita
+@login_required
+def editar_receita(request, receita_id):
+    receita = get_object_or_404(E_Receita, id=receita_id)
+    
+    try:
+        chefe_logado = E_Chefe.objects.get(usuario=request.user)
+    except E_Chefe.DoesNotExist:
+        messages.error(request, "Acesso negado. Você não é um Chefe.")
+        return redirect('visualizar_receita', receita_id=receita_id)
+    
+    if receita.autor != chefe_logado:
+        messages.error(request, "Acesso negado. Você não é o autor desta receita.")
+        return redirect('visualizar_receita', receita_id=receita_id)
+
+    if request.method == 'POST':
+        receita.nome = request.POST.get('nome')
+        receita.descricao = request.POST.get('descricao')
+        receita.preco = request.POST.get('preco')
+        receita.modo_de_preparo = request.POST.get('modo_de_preparo')
+        tempo_preparo = request.POST.get('tempo_preparo')
+        receita.dificuldade = request.POST.get('dificuldade')
+        
+        foto_nova = request.FILES.get('foto_receita')
+        if foto_nova:
+            receita.foto = foto_nova
+        
+        try:
+            receita.tempo_preparo = int(tempo_preparo)
+        except (ValueError, TypeError):
+            pass
+
+        receita.save()
+
+        tags_selecionadas = request.POST.getlist('tags')
+        receita.tags.clear()
+        for nome_tag in tags_selecionadas:
+            tag, _ = E_Tag.objects.get_or_create(nome=nome_tag)
+            receita.tags.add(tag)
+
+        ingredientes_texto = request.POST.get('ingredientes', '')
+        ingredientes_lista = [i.strip() for i in ingredientes_texto.split(',') if i.strip()]
+        receita.ingredientes.clear()
+        for nome_ingrediente in ingredientes_lista:
+            ingrediente, _ = E_Ingrediente.objects.get_or_create(nome=nome_ingrediente)
+            receita.ingredientes.add(ingrediente)
+
+        messages.success(request, f'Receita "{receita.nome}" atualizada com sucesso!')
+        return redirect('visualizar_receita', receita_id=receita.id)
+
+    ingredientes_string = ", ".join([i.nome for i in receita.ingredientes.all()])
+    
+    context = {
+        'receita': receita,
+        'tags': E_Receita.TAGS_PADRAO,
+        'ingredientes_string': ingredientes_string,
+    }
+    
+    return render(request, 'F_Tela_Cadastro_Receita.html', context)
+
+
+#UC17 - Editar/Excluir Receita
+@login_required
+def excluir_receita(request, receita_id):
+    receita = get_object_or_404(E_Receita, id=receita_id)
+    
+    try:
+        chefe_logado = E_Chefe.objects.get(usuario=request.user)
+    except E_Chefe.DoesNotExist:
+        messages.error(request, "Acesso negado. Você não é um Chefe.")
+        return redirect('visualizar_receita', receita_id=receita_id)
+    
+    if receita.autor != chefe_logado:
+        messages.error(request, "Acesso negado. Você não é o autor desta receita.")
+        return redirect('visualizar_receita', receita_id=receita_id)
+
+    if request.method == 'POST':
+        nome_receita = receita.nome
+        receita.delete()
+        messages.success(request, f'A receita "{nome_receita}" foi excluída com sucesso.')
+        return redirect('home')
+
+    return render(request, 'F_Tela_Confirmar_Exclusao.html', {'receita': receita})

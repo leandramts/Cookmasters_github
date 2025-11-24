@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2> Relatório de Vendas - Chefe {{ chefe.usuario.nome }}</h2>
+    <hr>
+
+    {% if relatorio %}
+    
+        <div class="summary-cards">
+            <h3>Resumo Geral</h3>
+            <p>Vendas Totais: <strong>{{ total_vendas_geral }}</strong></p>
+            <p>Receita Bruta Total: R$ <strong>{{ receita_bruta_geral|floatformat:2 }}</strong></p>
+            <p>Receita Líquida Total: R$ <strong>{{ receita_liquida_geral|floatformat:2 }}</strong></p>
+            <p>Receitas não vendidas: {{ receitas_sem_vendas }}</p>
+        </div>
+
+        <h3>Detalhes por Receita Vendida</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Receita</th>
+                    <th>Vendas</th>
+                    <th>Receita Bruta (R$)</th>
+                    <th>Taxa Adm (R$)</th>
+                    <th>Receita Líquida (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for receita in relatorio %}
+                    {% if receita.total_vendas > 0 %}
+                    <tr>
+                        <td><a href="{% url 'visualizar_receita' receita.id %}">{{ receita.nome }}</a></td>
+                        <td>{{ receita.total_vendas }}</td>
+                        <td>{{ receita.receita_bruta|floatformat:2 }}</td>
+                        <td>{{ receita.taxa_deduzida|floatformat:2 }}</td>
+                        <td>{{ receita.receita_liquida|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    
+    {% else %}
+        <p>Ainda não há vendas registradas para suas receitas, ou você não tem receitas cadastradas.</p>
+    {% endif %}
+
+    <div style="margin-top: 20px;">
+        <a href="{% url 'home' %}" class="btn">Voltar para Home</a>
+    </div>
+
+</div>
+{% endblock %}

@@ -124,10 +124,15 @@ nav :hover {
     border-radius: 8px;
     cursor: pointer;
     transition: 0.3s;
-    width: 100%;
-    display: block;
     text-align: center;
     text-decoration: none;
+    display: inline-block; 
+}
+
+.container-auth form button,
+.container-auth form .botao-link {
+    width: 100%;
+    display: block;
 }
 
 .container-auth button:hover,
@@ -261,4 +266,186 @@ nav :hover {
     border: none;
     border-radius: 6px;
     cursor: pointer;
+}
+
+.container {
+    background: #fff9cc;
+    padding: 25px 35px;
+    margin: 30px auto;
+    width: 85%;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.container h2 {
+    background-color: #e1a536;
+    color: #333;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.summary-cards {
+    background: #fef4b5;
+    border-left: 6px solid #d46b08;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.summary-cards h3 {
+    color: #088341;
+    margin-bottom: 12px;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+table thead {
+    background: #f3a921;
+    color: white;
+}
+
+table th, table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+table tbody tr {
+    background: #ffffff;
+}
+
+table tbody tr:hover {
+    background: #ffe28c;
+}
+
+table th a,
+table td a {
+    color: #088341;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+table td a:hover {
+    color: #d46b08;
+    text-decoration: underline;
+}
+
+
+.btn {
+    background-color: #B3DE58;
+    color: #000;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background-color: #a0c84f;
+}
+
+.acoes-chefe {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+}
+
+
+.acoes-chefe a {
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    display: inline-block;
+    margin: 0 10px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+
+.btn-editar {
+    background-color: #B3DE58; 
+    color: #333;
+    border: 1px solid #a0c84f;
+}
+
+.btn-editar:hover {
+    background-color: #a0c84f;
+    color: #000;
+}
+
+.btn-excluir {
+    background-color: #e74c3c; 
+    color: white;
+    border: 1px solid #c0392b;
+}
+
+.btn-excluir:hover {
+    background-color: #c0392b;
+}
+
+.lista-ingredientes-sem-marcadores {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.lista-ingredientes-sem-marcadores li {
+    margin-bottom: 5px;
+    padding-left: 15px;
+    position: relative;
+    color: #333;
+}
+
+.lista-ingredientes-sem-marcadores li::before {
+    content: "•";
+    color: #088341;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+.container form {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.btn-confirm-delete {
+    background-color: #e74c3c;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.btn-cancel {
+    padding: 12px 25px;
+    background-color: #f3a921;
+    color: #333;
+    text-decoration: none;
+    border-radius: 8px;
+    display: inline-block;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.btn-voltar-center {
+    display: block;
+    width: fit-content; 
+    margin: 25px auto 0 auto;
 }

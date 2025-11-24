@@ -1,62 +1,94 @@
-{% extends 'base.html' %} 
-
+{% extends "base.html" %}
 {% block content %}
+
 <div class="auth-page">
     <div class="container-auth">
-        <h1>Cadastrar Nova Receita</h1>
-
         
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
+        {# 1. TÍTULO E ACTION DO FORMULÁRIO #}
+        {% if receita %}
+            <h1>Editar Receita: {{ receita.nome }}</h1>
+            <form method="POST" action="{% url 'editar_receita' receita.id %}" enctype="multipart/form-data">
+        {% else %}
+            <h1> Cadastrar Nova Receita</h1>
+            <form method="POST" action="{% url 'cadastrar_receita' %}" enctype="multipart/form-data">
         {% endif %}
+        
+        {% csrf_token %}
+        
+        {% for message in messages %}
+            <ul class="messages">
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            </ul>
+        {% endfor %}
+        
+        <label for="nome">Nome:</label>
+        {# 2. PREENCHE CAMPO DE TEXTO #}
+        <input type="text" id="nome" name="nome" value="{{ receita.nome|default_if_none:'' }}" required>
 
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            <label>Nome da Receita:</label>
-            <input type="text" name="nome" required>
+        <label for="descricao">Descrição:</label>
+        {# 2. PREENCHE CAMPO DE TEXTAREA #}
+        <textarea id="descricao" name="descricao" required>{{ receita.descricao|default_if_none:'' }}</textarea>
 
-            <label>Preço:</label>
-            <input type="number" step="0.01" name="preco" required>
+        <label for="preco">Preço (R$):</label>
+        {# 3. PREENCHE PREÇO #}
+        <input type="number" id="preco" name="preco" step="0.01" value="{{ receita.preco|default_if_none:'' }}" required>
 
-            <label>Descrição:</label>
-            <textarea name="descricao" required></textarea>
+        <label for="modo_de_preparo">Modo de Preparo:</label>
+        {# 2. PREENCHE CAMPO DE TEXTAREA #}
+        <textarea id="modo_de_preparo" name="modo_de_preparo" required>{{ receita.modo_de_preparo|default_if_none:'' }}</textarea>
 
-            <label>Modo de Preparo:</label>
-            <textarea name="modo_de_preparo" placeholder="Descreva o modo de preparo..." required></textarea>
+        <label for="tempo_preparo">Tempo de Preparo (minutos):</label>
+        {# 3. PREENCHE TEMPO #}
+        <input type="number" id="tempo_preparo" name="tempo_preparo" value="{{ receita.tempo_preparo|default_if_none:'' }}" required>
 
-            <label>Tags:</label>
-            <div class="checkbox-group">
-                {% for tag in tags %}
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="tag_{{ forloop.counter }}" name="tags" value="{{ tag }}">
-                        <label for="tag_{{ forloop.counter }}">{{ tag }}</label>
-                    </div>
-                {% endfor %}
+        <label for="dificuldade">Dificuldade:</label>
+        {# 4. PREENCHE CAMPO DE SELEÇÃO #}
+        <select id="dificuldade" name="dificuldade" required>
+            <option value="facil" {% if receita.dificuldade == 'facil' %}selected{% endif %}>Fácil</option>
+            <option value="medio" {% if receita.dificuldade == 'medio' %}selected{% endif %}>Médio</option>
+            <option value="dificil" {% if receita.dificuldade == 'dificil' %}selected{% endif %}>Difícil</option>
+        </select>
+        
+        <label for="ingredientes">Ingredientes (Separados por vírgula):</label>
+        {# 5. PREENCHE INGREDIENTES (usando a string preparada na view) #}
+        <textarea id="ingredientes" name="ingredientes" required>{{ ingredientes_string|default_if_none:'' }}</textarea>
+        
+        <label>Tags (Selecione todas que se aplicam):</label>
+        {# 6. PREENCHE CHECKBOXES DE TAGS #}
+        <div class="checkbox-group">
+            {% for tag_nome in tags %}
+            <div class="checkbox-item">
+                <input type="checkbox" 
+                       id="tag_{{ forloop.counter }}" 
+                       name="tags" 
+                       value="{{ tag_nome }}"
+                       {# Verifica se esta tag está associada à receita #}
+                       {% if receita and tag_nome in receita.tags.names %}checked{% endif %}>
+                <label for="tag_{{ forloop.counter }}">{{ tag_nome }}</label>
             </div>
-
-            <label>Ingredientes (separe por vírgula):</label>
-            <input type="text" name="ingredientes">
+            {% endfor %}
+        </div>
+        
+        {% if receita and receita.foto %}
+            <p>Foto Atual:</p>
+            <img src="{{ receita.foto.url }}" style="max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 10px;">
+            <label for="foto_receita">Substituir Foto (Opcional):</label>
+        {% else %}
             <label for="foto_receita">Foto da Receita:</label>
-            <input type="file" name="foto_receita" id="foto_receita" accept="image/*">
+        {% endif %}
+        
+        <input type="file" id="foto_receita" name="foto_receita" {% if not receita %}required{% endif %}>
 
-            <label>Tempo de Preparo (minutos):</label>
-<input type="number" name="tempo_preparo" min="1" required>
-            <label>Nível de Dificuldade:</label>
-<select name="dificuldade" required>
-    <option value="facil">Fácil</option>
-    <option value="medio">Médio</option>
-    <option value="dificil">Difícil</option>
-</select>
+        <button type="submit">
+            {% if receita %}
+                Salvar Alterações
+            {% else %}
+                Cadastrar Receita
+            {% endif %}
+        </button>
 
-
-
-
-            <button type="submit">Cadastrar Receita</button>
         </form>
+    </div>
 </div>
-{% endblock content %}
+
+{% endblock %}

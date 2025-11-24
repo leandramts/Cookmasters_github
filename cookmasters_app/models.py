@@ -139,7 +139,7 @@ class E_Pagamento(models.Model):
 
 class E_Compra(models.Model):
     consumidor = models.ForeignKey(E_Consumidor, on_delete=models.CASCADE)
-    receita = models.ForeignKey(E_Receita, on_delete=models.CASCADE)
+    receita = models.ForeignKey(E_Receita, on_delete=models.CASCADE, related_name = 'vendas')
     pagamento = models.ForeignKey(E_Pagamento, on_delete=models.CASCADE, null=True)
 
     data_compra = models.DateTimeField(auto_now_add=True)

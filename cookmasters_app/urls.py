@@ -23,9 +23,12 @@ urlpatterns = [
     path("receita/<int:receita_id>/comprar/", views.comprar_receita, name="comprar_receita"),
     path('receitas/<int:receita_id>/pagamento/', views.selecionar_pagamento, name='selecionar_pagamento'),
     path("receitas/<int:receita_id>/avaliar/", views.avaliar_receita, name="avaliar_receita"),
+    path('receita/editar/<int:receita_id>/', views.editar_receita, name='editar_receita'),
+    path('receita/excluir/<int:receita_id>/', views.excluir_receita, name='excluir_receita'),
 
 
     #Rotas de Visualizacao
     path("chefe/<int:id>/", views.visualizar_chefe, name="visualizar_chefe"),
-    path("cozinhe-me/", views.cozinhe_me, name='cozinheme')
+    path("cozinhe-me/", views.cozinhe_me, name='cozinheme'),
+    path('relatorio/vendas/', views.relatorio_vendas_chefe, name='relatorio_vendas_chefe')
 ]

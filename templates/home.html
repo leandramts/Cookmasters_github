@@ -6,7 +6,16 @@
     <div class="boas-vindas">
         {% if user.is_authenticated %}
             <h2>Olá, {{ user.nome }}!</h2>
-            <p>Pronto para cozinhar? Veja as receitas em destaque:</p>
+             {% with user.e_chefe as chefe_profile %}
+            {% if chefe_profile %}
+                <div style="margin-top: 15px;">
+                    <a href="{% url 'relatorio_vendas_chefe' %}" class="btn-report" style="padding: 10px 20px; background-color: #088341; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">
+                        Visualizar Relatório de Vendas
+                    </a>
+                </div>
+            {% endif %}
+        {% endwith %}
+
         {% else %}
             <h1>Bem-vindo ao Cookmasters!</h1>
             <p>Sua plataforma para descobrir e partilhar receitas. Faça login ou cadastre-se!</p>
@@ -70,19 +79,17 @@
                     </a>
                 </h3>
 
-
-<p>Por: 
-    <a href="{% url 'visualizar_chefe' receita.autor.id %}">
-        {{ receita.autor.usuario.nome }}
-    </a>
-</p>
-<p>Nota: {{ receita.nota }} ★</p>
+                <p>Por: 
+                    <a href="{% url 'visualizar_chefe' receita.autor.id %}">
+                        {{ receita.autor.usuario.nome }}
+                    </a>
+                </p>
+                
+                <p>Nota: {{ receita.nota }} ★</p>
                 <p>Preço: R$ {{ receita.preco }}</p>
                 
                 <p><strong>Tempo de Preparo:</strong> {{ receita.tempo_preparo }} minutos</p>
                 <p><strong>Dificuldade:</strong> {{ receita.dificuldade|capfirst }}</p> 
-                <p>Nota: {{ receita.nota }} ★</p>
-                <p>Preço: R$ {{ receita.preco }}</p>
 
                 <p><strong>Tags:</strong>
                     {% if receita.tags.all %}
