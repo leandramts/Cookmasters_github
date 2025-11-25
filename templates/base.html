@@ -18,6 +18,7 @@
 
                 <a href="{% url 'cadastrar_receita' %}">Cadastrar Receita</a>
                 <a href="{% url 'relatorio_vendas_chefe' %}">Relatório de Vendas</a>
+                
             {% endif %}
         {% endwith %}
         
@@ -32,6 +33,7 @@
             <a href="{% url 'listar_usuarios' %}">Gerenciar Usuários</a>
 <a href="{% url 'listar_receitas' %}">Gerenciar Receitas</a>
 <a href="{% url 'listar_comentarios' %}">Gerenciar Comentários</a>
+<a href="{% url 'admin_monitorar_transacoes' %}">Monitorar Transações Financeiras</a>
 
         {% endif %}
 
