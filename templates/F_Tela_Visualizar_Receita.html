@@ -99,11 +99,19 @@
         {% endif %}
 
         {% if user.is_authenticated and autor.usuario == user %}
-            <div class="acoes-chefe">
-                <a href="{% url 'editar_receita' receita.id %}" class="btn-editar">Editar Receita</a>
-                <a href="{% url 'excluir_receita' receita.id %}" class="btn-excluir">Excluir Receita</a>
-            </div>
-        {% endif %}
+    <div class="acoes-chefe">
+        <a href="{% url 'editar_receita' receita.id %}" class="btn-editar">
+            Editar Receita
+        </a>
+        
+        <form method="POST" action="{% url 'excluir_receita' receita.id %}" onsubmit="return confirm('Tem certeza que deseja EXCLUIR permanentemente a receita {{ receita.nome }}?');" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-excluir">
+                Excluir Receita
+            </button>
+        </form>
+    </div>
+{% endif %}
 
         <a href="{% url 'home' %}" class="botao-link" style="margin-top: 25px;">
             Voltar

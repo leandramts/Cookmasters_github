@@ -24,9 +24,16 @@
         {% with user.e_consumidor as consumidor_profile %}
             {% if consumidor_profile %}
                 <a href="{% url 'ver_carrinho' %}">Carrinho</a>
-                <li><a href="{% url 'minhas_receitas' %}">Minhas Receitas</a></li>
+                <a href="{% url 'minhas_receitas' %}">Minhas Receitas</a>
             {% endif %}
         {% endwith %}
+
+        {% if user.is_staff or user.is_superuser %}
+            <a href="{% url 'listar_usuarios' %}">Gerenciar Usuários</a>
+<a href="{% url 'listar_receitas' %}">Gerenciar Receitas</a>
+<a href="{% url 'listar_comentarios' %}">Gerenciar Comentários</a>
+
+        {% endif %}
 
         <a href="{% url 'cozinheme' %}">Cozinhe-me</a>
         <a href="{% url 'logout' %}">Sair</a>

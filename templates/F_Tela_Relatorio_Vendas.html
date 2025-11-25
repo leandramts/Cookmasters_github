@@ -28,15 +28,13 @@
             </thead>
             <tbody>
                 {% for receita in relatorio %}
-                    {% if receita.total_vendas > 0 %}
                     <tr>
                         <td><a href="{% url 'visualizar_receita' receita.id %}">{{ receita.nome }}</a></td>
                         <td>{{ receita.total_vendas }}</td>
-                        <td>{{ receita.receita_bruta|floatformat:2 }}</td>
+                        <td>{{ receita.receita_bruta_calculada|floatformat:2 }}</td>
                         <td>{{ receita.taxa_deduzida|floatformat:2 }}</td>
                         <td>{{ receita.receita_liquida|floatformat:2 }}</td>
                     </tr>
-                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>

@@ -4,23 +4,52 @@
 <div class="home-bg">
 
     <div class="boas-vindas">
+
         {% if user.is_authenticated %}
+
             <h2>Olá, {{ user.nome }}!</h2>
-             {% with user.e_chefe as chefe_profile %}
-            {% if chefe_profile %}
-                <div style="margin-top: 15px;">
-                    <a href="{% url 'relatorio_vendas_chefe' %}" class="btn-report" style="padding: 10px 20px; background-color: #088341; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">
-                        Visualizar Relatório de Vendas
+
+            <div class="btn-welcome-container">
+
+                {# BOTÃO DO CONSUMIDOR — Minhas Receitas #}
+                {% if user.e_consumidor %}
+                    <a href="{% url 'minhas_receitas' %}" class="btn-welcome">
+                        Minhas Receitas
                     </a>
-                </div>
-            {% endif %}
-        {% endwith %}
+                {% endif %}
+
+                {# BOTÃO DO CHEFE — Relatório de vendas #}
+                {% if user.e_chefe %}
+                    <a href="{% url 'relatorio_vendas_chefe' %}" class="btn-welcome">
+                        Relatório de Vendas
+                    </a>
+                {% endif %}
+
+                {# BOTÕES DO ADMIN — Usuários / Receitas / Comentários #}
+                {% if user.is_superuser %}
+                    <a href="{% url 'listar_usuarios' %}" class="btn-welcome">
+                        Gerenciar Usuários
+                    </a>
+
+                    <a href="{% url 'listar_receitas' %}" class="btn-welcome">
+                        Gerenciar Receitas
+                    </a>
+
+                    <a href="{% url 'listar_comentarios' %}" class="btn-welcome">
+                        Gerenciar Comentários
+                    </a>
+                {% endif %}
+
+            </div>
 
         {% else %}
+
             <h1>Bem-vindo ao Cookmasters!</h1>
             <p>Sua plataforma para descobrir e partilhar receitas. Faça login ou cadastre-se!</p>
+
         {% endif %}
-    </div>
+
+    </div>  {# Fim boas-vindas #}
 
     <hr>
 

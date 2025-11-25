@@ -35,10 +35,11 @@ class E_UsuarioGeral(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nome']
 
+    is_active = models.BooleanField(default=True)
+
     objects = E_UsuarioGeralManager()
     def __str__(self):
         return self.email
-
 
 class E_Chefe(models.Model):
     usuario = models.OneToOneField(E_UsuarioGeral, on_delete=models.CASCADE)

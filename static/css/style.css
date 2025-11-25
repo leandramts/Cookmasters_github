@@ -449,3 +449,33 @@ table td a:hover {
     width: fit-content; 
     margin: 25px auto 0 auto;
 }
+
+/* Centraliza toda a seção de boas-vindas */
+.boas-vindas {
+    text-align: center;
+}
+
+.btn-welcome-container {
+    display: flex;
+    justify-content: center; 
+    flex-wrap: wrap;         
+    gap: 15px;               
+    margin: 20px 0;
+}
+
+
+.btn-welcome {
+    background-color: #088341;
+    color: white;
+    padding: 10px 22px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: 0.2s;
+    display: inline-block;
+}
+
+.btn-welcome:hover {
+    background-color: #066c36;
+    transform: scale(1.05);
+}

@@ -1,6 +1,6 @@
 # cookmasters_app/urls.py
 from django.urls import path
-from . import views # Importa o seu views.py gigante
+from . import views 
 
 urlpatterns = [
     # Rotas da Home
@@ -24,7 +24,7 @@ urlpatterns = [
     path('receitas/<int:receita_id>/pagamento/', views.selecionar_pagamento, name='selecionar_pagamento'),
     path("receitas/<int:receita_id>/avaliar/", views.avaliar_receita, name="avaliar_receita"),
     path('receita/editar/<int:receita_id>/', views.editar_receita, name='editar_receita'),
-    path('receita/excluir/<int:receita_id>/', views.excluir_receita, name='excluir_receita'),
+    path('receita/excluir/<int:receita_id>/', views.chefe_excluir_receita, name='excluir_receita'),
 
 
     #Rotas de Visualizacao
@@ -39,5 +39,17 @@ urlpatterns = [
     path("carrinho/adicionar/<int:receita_id>/", views.adicionar_ao_carrinho, name="adicionar_ao_carrinho"),
     path("carrinho/remover/<int:receita_id>/", views.remover_do_carrinho, name="remover_do_carrinho"),
     path("carrinho/pagar/", views.pagamento_carrinho, name="pagamento_carrinho"),
+
+           path("adm/usuarios/", views.listar_usuarios, name="listar_usuarios"),
+    path("adm/usuarios/bloquear/<int:user_id>/", views.bloquear_usuario, name="bloquear_usuario"),
+    path("adm/usuarios/desbloquear/<int:user_id>/", views.desbloquear_usuario, name="desbloquear_usuario"),
+
+    # Receitas
+    path("adm/receitas/", views.listar_receitas, name="listar_receitas"),
+    path("adm/receitas/excluir/<int:receita_id>/", views.adm_excluir_receita, name="adm_excluir_receita"),
+
+    # Comentários
+    path("adm/comentarios/", views.listar_comentarios, name="listar_comentarios"),
+    path("adm/comentarios/excluir/<int:comentario_id>/", views.excluir_comentario, name="excluir_comentario"),
 
 ]

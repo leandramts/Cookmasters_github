@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Painel Administrativo — Receitas</h2>
+    <hr>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Foto</th>
+                <th>Nome</th>
+                <th>Autor</th>
+                <th>Preço</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for r in receitas %}
+            <tr>
+                <td>
+                    {% if r.foto %}
+                        <img src="{{ r.foto.url }}" width="70">
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ r.nome }}</td>
+                <td>{{ r.autor.usuario.nome }}</td>
+                <td>R$ {{ r.preco }}</td>
+
+                <td>
+                    <a class="btn btn-danger btn-sm"
+                       href="{% url 'adm_excluir_receita' r.id %}"
+                       onclick="return confirm('Excluir esta receita?');">
+                       Excluir
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

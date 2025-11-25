@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Painel Administrativo — Usuários</h2>
+    <hr>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in usuarios %}
+            <tr>
+                <td>{{ user.nome }}</td>
+                <td>{{ user.email }}</td>
+
+                <td>
+                    {% if user.e_chefe %}
+                        Chefe
+                    {% elif user.e_consumidor %}
+                        Consumidor
+                    {% else %}
+                        Não identificado
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if user.is_active %}
+                        <span class="text-success">Ativo</span>
+                    {% else %}
+                        <span class="text-danger">Bloqueado</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if user.is_active %}
+                        <a href="{% url 'bloquear_usuario' user.id %}" class="btn btn-danger btn-sm">
+                            Bloquear
+                        </a>
+                    {% else %}
+                        <a href="{% url 'desbloquear_usuario' user.id %}" class="btn btn-success btn-sm">
+                            Desbloquear
+                        </a>
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

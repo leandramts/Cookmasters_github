@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Painel Administrativo — Comentários</h2>
+    <hr>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Receita</th>
+                <th>Consumidor</th>
+                <th>Nota</th>
+                <th>Comentário</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for c in comentarios %}
+            <tr>
+                <td>{{ c.receita.nome }}</td>
+                <td>{{ c.consumidor.usuario.nome }}</td>
+                <td>{{ c.nota }}</td>
+                <td>{{ c.comentario }}</td>
+
+                <td>
+                    <a class="btn btn-danger btn-sm"
+                       href="{% url 'excluir_comentario' c.id %}"
+                       onclick="return confirm('Excluir este comentário?');">
+                       Excluir
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+{% endblock %}
