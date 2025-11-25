@@ -35,8 +35,6 @@ class E_UsuarioGeral(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nome']
 
-    is_active = models.BooleanField(default=True)
-
     objects = E_UsuarioGeralManager()
     def __str__(self):
         return self.email

@@ -12,7 +12,7 @@ from django.db.models import Avg
 
 # Home, nossa pagina inicial
 def home_view(request):
-    receitas_em_destaque = E_Receita.objects.order_by('-nota')[:6]
+    receitas_em_destaque = E_Receita.objects.order_by('-nota')
     todas_tags = E_Tag.objects.all()  
 
     return render(request, 'home.html', {
@@ -22,6 +22,7 @@ def home_view(request):
         'selecionado_tempo': "",
         'selecionadas_tags': [],
     })
+
 #UC01 - Fazer Login
 def login_view(request):
 
@@ -785,41 +786,3 @@ def excluir_comentario(request, comentario_id):
 def listar_comentarios(request):
     comentarios = E_Avaliacoes.objects.all().select_related("receita", "consumidor")
     return render(request, "F_Tela_ADM_Ver_Comentarios.html", {"comentarios": comentarios})
-
-@login_required
-@user_passes_test(lambda u: u.is_superuser)
-def admin_monitorar_transacoes(request):
-    TAXA_ADM = Decimal("0.10") # 10%
-
-    transacoes = E_Compra.objects.select_related(
-        'receita', 
-        'consumidor', 
-        'consumidor__usuario', 
-        'receita__autor', 
-        'receita__autor__usuario'
-    ).annotate(
-        preco_receita=F('receita__preco'),
-        
-        valor_taxa_adm=ExpressionWrapper(
-            F('receita__preco') * TAXA_ADM,
-            output_field=DecimalField(decimal_places=2)
-        ),
-        
-        repasse_chefe=ExpressionWrapper(
-            F('receita__preco') - (F('receita__preco') * TAXA_ADM),
-            output_field=DecimalField(decimal_places=2)
-        )
-    ).order_by('-data_compra')
-
-    totais = transacoes.aggregate(
-        total_bruto_geral=Sum('preco_receita'),
-        total_taxa_adm_geral=Sum('valor_taxa_adm'),
-        total_repasse_chefe_geral=Sum('repasse_chefe')
-    )
-    
-    context = {
-        'transacoes': transacoes,
-        'totais': totais,
-    }
-
-    return render(request, 'F_Tela_ADM_Monitorar_Transacoes.html', context)

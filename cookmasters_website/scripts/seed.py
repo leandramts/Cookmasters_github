@@ -132,7 +132,7 @@ for i, dados in enumerate(RECEITAS_DETALHADAS):
         descricao=f'{dados["nome"]}, uma receita {dificuldade_str} de preparo.',
         tempo_preparo=dados["tempo"],
         dificuldade=dificuldade_str,
-        modo_de_preparo=f"Misture os ingredientes e asse/cozinhe por aproximadamente {dados['tempo']} minutos. DETALHES SOMENTE APÓS A COMPRA.",
+        modo_de_preparo=f"Misture os ingredientes e asse/cozinhe por aproximadamente {dados['tempo']} minutos.",
         foto=foto_receita_padrao,
         nota=nota_inicial
     )
