@@ -165,6 +165,9 @@ def visualizar_chefe(request, id):
 def cadastrar_receita(request):
     if request.method == 'POST':
         try:
+
+            # Pegando os dados enviados pela F_Tela_Cadastro_Receita
+
             autor = E_Chefe.objects.get(usuario=request.user)
             nome = request.POST.get('nome')
             descricao = request.POST.get('descricao')
@@ -177,7 +180,7 @@ def cadastrar_receita(request):
             foto = request.FILES.get('foto_receita')
 
 
-            # Criar receita
+            # Criar um objeto da classe E_Receita
             receita = E_Receita.objects.create(
                 autor=autor,
                 nome=nome,
@@ -195,7 +198,7 @@ def cadastrar_receita(request):
                 tag, _ = E_Tag.objects.get_or_create(nome=nome_tag)
                 receita.tags.add(tag)
 
-            # Processar ingredientes
+            # Criando uma instância da classe E_ingrediente e relacionando-os com a receita
             ingredientes_lista = [i.strip() for i in ingredientes_texto.split(',') if i.strip()]
             for nome_ingrediente in ingredientes_lista:
                 ingrediente, _ = E_Ingrediente.objects.get_or_create(nome=nome_ingrediente)
@@ -216,13 +219,17 @@ def cadastrar_receita(request):
         'tags': E_Receita.TAGS_PADRAO
     })
 
+
+
+
 # UC04 - Selecionar Ingredientes
 
 def cozinhe_me(request):
+
     # Lista completa de ingredientes, ordenados
     ingredientes = E_Ingrediente.objects.all().order_by("nome")
 
-    # Ingredientes selecionados (vêm dos checkboxes)
+    # Ingredientes selecionados (vêm dos checkboxes) na tela de F_Tela_CozinheMe
     selecionados_ids = request.POST.getlist("ingredientes")
     ingredientes_selecionados = E_Ingrediente.objects.filter(id__in=selecionados_ids)
 
@@ -236,14 +243,16 @@ def cozinhe_me(request):
             .distinct()
         )
 
-        # Mantém somente receitas que NÃO possuam ingredientes fora da seleção
+        # Conjunto dos ingredientes selecionados
         conjunto_selecionado = set(ingredientes_selecionados)
 
+        # Guarda as receitas cujo seu conjunto de ingredientes é subconjunto dos conjunto dos ingredientes selecionados 
         receitas = [
             r for r in receitas_possiveis
             if set(r.ingredientes.all()).issubset(conjunto_selecionado)
         ]
 
+    # Guarda os ingredientes, os ingredientes selecionados e as receitas resultantes para mostrar na F_Tela_CozinheMe.html
     context = {
         "ingredientes": ingredientes,
         "ingredientes_selecionados": ingredientes_selecionados,
