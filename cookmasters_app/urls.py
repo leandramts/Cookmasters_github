@@ -30,5 +30,14 @@ urlpatterns = [
     #Rotas de Visualizacao
     path("chefe/<int:id>/", views.visualizar_chefe, name="visualizar_chefe"),
     path("cozinhe-me/", views.cozinhe_me, name='cozinheme'),
-    path('relatorio/vendas/', views.relatorio_vendas_chefe, name='relatorio_vendas_chefe')
+    path('relatorio/vendas/', views.relatorio_vendas_chefe, name='relatorio_vendas_chefe'),
+    path("receitas/minhas/", views.minhas_receitas, name="minhas_receitas"),
+
+
+    #Rotas do Carrinho de compras
+    path("carrinho/", views.ver_carrinho, name="ver_carrinho"),
+    path("carrinho/adicionar/<int:receita_id>/", views.adicionar_ao_carrinho, name="adicionar_ao_carrinho"),
+    path("carrinho/remover/<int:receita_id>/", views.remover_do_carrinho, name="remover_do_carrinho"),
+    path("carrinho/pagar/", views.pagamento_carrinho, name="pagamento_carrinho"),
+
 ]

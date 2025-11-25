@@ -36,7 +36,11 @@
                 {% if receitas %}
                     {% for receita in receitas %}
                         <div class="recipe-card" style="margin-bottom: 15px;">
-                            <h3>{{ receita.nome }}</h3>
+                            <h3>
+                                <a href="{% url 'visualizar_receita' receita.id %}" style="color:#088341; text-decoration:none;">
+                                    {{ receita.nome }}
+                                </a>
+                            </h3>
                             <p><strong>Descrição:</strong> {{ receita.descricao }}</p>
                             <p><strong>Preço:</strong> R$ {{ receita.preco }}</p>
                             <p><strong>Nota:</strong> {{ receita.nota }}</p>

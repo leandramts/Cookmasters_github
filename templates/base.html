@@ -20,6 +20,13 @@
                 <a href="{% url 'relatorio_vendas_chefe' %}">Relatório de Vendas</a>
             {% endif %}
         {% endwith %}
+        
+        {% with user.e_consumidor as consumidor_profile %}
+            {% if consumidor_profile %}
+                <a href="{% url 'ver_carrinho' %}">Carrinho</a>
+                <li><a href="{% url 'minhas_receitas' %}">Minhas Receitas</a></li>
+            {% endif %}
+        {% endwith %}
 
         <a href="{% url 'cozinheme' %}">Cozinhe-me</a>
         <a href="{% url 'logout' %}">Sair</a>

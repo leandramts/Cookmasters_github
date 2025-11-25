@@ -31,9 +31,20 @@
                 </span>
             </p>
 
-            
-            <form method="POST" action="{% url 'selecionar_pagamento' receita.id %}">
+            <!-- ⭐ BOTÃO DE ADICIONAR AO CARRINHO ⭐ -->
+            {% if user.is_authenticated and not modo_liberado %}
+                <a href="{% url 'adicionar_ao_carrinho' receita.id %}"
+                   class="botao-link" 
+                   style="margin-top: 15px; display:block; text-align:center;">
+                    Adicionar ao carrinho
+                </a>
+            {% endif %}
+
+            <!-- ⭐ BOTÃO DE COMPRA DIRETA ⭐ -->
+            <form method="POST" action="{% url 'selecionar_pagamento' receita_id %}">
+
                 {% csrf_token %}
+                <input type="hidden" name="compra_unica" value="{{ receita.id }}">
                 <button class="botao-link" type="submit" style="margin-top: 15px;">
                     Comprar por R$ {{ preco }}
                 </button>
@@ -48,7 +59,6 @@
 
         <hr style="margin: 20px 0;">
 
-        
         <h3 style="color:#088341; text-align:left;">Ingredientes</h3>
         <ul>
             {% for i in ingredientes %}
@@ -56,7 +66,6 @@
             {% endfor %}
         </ul>
 
-       
         <h3 style="color:#088341; text-align:left; margin-top:20px;">Tags</h3>
         {% if tags %}
             {% for tag in tags %}
@@ -68,7 +77,6 @@
 
         <br><br>
 
-        
         <hr>
         <h3 style="color:#088341;">Avaliações</h3>
         {% for avaliacao in receita.e_avaliacoes_set.all %}
@@ -80,7 +88,6 @@
             <p>Nenhuma avaliação ainda.</p>
         {% endfor %}
 
-      
         {% if modo_liberado and not avaliou %}
             <form method="GET" action="{% url 'avaliar_receita' receita.id %}">
                 <button type="submit" class="botao-link" style="margin-top: 15px;">
@@ -92,18 +99,12 @@
         {% endif %}
 
         {% if user.is_authenticated and autor.usuario == user %}
-    <div class="acoes-chefe">
-        <a href="{% url 'editar_receita' receita.id %}" class="btn-editar">
-            Editar Receita
-        </a>
-        
-        <a href="{% url 'excluir_receita' receita.id %}" class="btn-excluir" >
-            Excluir Receita
-        </a>
-    </div>
-{% endif %}
+            <div class="acoes-chefe">
+                <a href="{% url 'editar_receita' receita.id %}" class="btn-editar">Editar Receita</a>
+                <a href="{% url 'excluir_receita' receita.id %}" class="btn-excluir">Excluir Receita</a>
+            </div>
+        {% endif %}
 
-       
         <a href="{% url 'home' %}" class="botao-link" style="margin-top: 25px;">
             Voltar
         </a>

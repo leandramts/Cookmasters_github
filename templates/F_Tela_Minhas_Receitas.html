@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="home-bg">
+
+    <div class="container-auth" style="width: 700px;">
+
+        <h1>Minhas Receitas</h1>
+
+        {% if receitas %}
+            <div class="caixa-lista">
+
+                <ul class="lista-receitas">
+                    {% for r in receitas %}
+                        <li class="item-receita">
+                            <span>{{ r.nome }}</span>
+                            <a href="{% url 'visualizar_receita' receita_id=r.id %}"
+                               class="botao-link"
+                               style="padding:6px 12px; font-size:14px;">
+                                Ver Receita
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+
+        {% else %}
+            <p style="color:#555; margin-top:20px;">
+                Você ainda não comprou nenhuma receita.
+            </p>
+
+            <a href="{% url 'home' %}" class="botao-link" style="margin-top:15px;">
+                Explorar Receitas
+            </a>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<style>
+.caixa-lista {
+    margin-top: 20px;
+    width: 100%;
+    background: #fffce6;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.08);
+}
+
+.lista-receitas {
+    list-style: none;
+    padding: 0;
+}
+
+.item-receita {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #fff;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 1px 5px rgba(0,0,0,0.1);
+    font-size: 16px;
+}
+</style>
+
+{% endblock %}

@@ -280,6 +280,7 @@ def visualizar_receita(request, receita_id):
 
     contexto = {
         'receita': receita,
+        'receita_id': receita.id,   # ✅ ADICIONAR ISTO
         'autor': receita.autor,
         'nome': receita.nome,
         'preco': receita.preco,
@@ -294,6 +295,7 @@ def visualizar_receita(request, receita_id):
         'modo_liberado': modo_liberado,
         'avaliou': avaliou,
     }
+
 
     return render(request, 'F_Tela_Visualizar_Receita.html', contexto)
 
@@ -585,3 +587,139 @@ def excluir_receita(request, receita_id):
         return redirect('home')
 
     return render(request, 'F_Tela_Confirmar_Exclusao.html', {'receita': receita})
+
+@login_required
+def adicionar_ao_carrinho(request, receita_id):
+    receita = get_object_or_404(E_Receita, id=receita_id)
+
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar.")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    carrinho = request.session.get("carrinho", [])
+
+    if receita_id not in carrinho:
+        carrinho.append(receita_id)
+        request.session["carrinho"] = carrinho
+        messages.success(request, "Receita adicionada ao carrinho!")
+    else:
+        messages.info(request, "Esta receita já está no carrinho.")
+
+    return redirect("ver_carrinho")
+
+@login_required
+def ver_carrinho(request):
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar.")
+        return redirect("home")
+
+    carrinho = request.session.get("carrinho", [])
+
+    receitas = E_Receita.objects.filter(id__in=carrinho)
+    total = sum(r.preco for r in receitas)
+
+    return render(request, "F_Tela_Carrinho.html", {
+        "receitas": receitas,
+        "total": total
+    })
+
+@login_required
+def remover_do_carrinho(request, receita_id):
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar.")
+        return redirect("home")
+
+    carrinho = request.session.get("carrinho", [])
+
+    if receita_id in carrinho:
+        carrinho.remove(receita_id)
+        request.session["carrinho"] = carrinho
+        messages.success(request, "Receita removida do carrinho.")
+    else:
+        messages.info(request, "Essa receita não estava no carrinho.")
+
+    return redirect("ver_carrinho")
+
+from django.contrib.auth.decorators import login_required
+from decimal import Decimal
+
+@login_required
+def pagamento_carrinho(request):
+    # Verifica se é consumidor
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar.")
+        return redirect("home")
+
+    # Carrinho armazenado na sessão
+    carrinho = request.session.get("carrinho", [])
+
+    if not carrinho:
+        messages.info(request, "Seu carrinho está vazio.")
+        return redirect("ver_carrinho")
+
+    receitas = E_Receita.objects.filter(id__in=carrinho)
+    total = sum(r.preco for r in receitas)
+
+    if request.method == "POST":
+        metodo = request.POST.get("tipo_pagamento")
+
+        if metodo not in ["pix", "credito", "debito"]:
+            messages.error(request, "Método de pagamento inválido.")
+            return redirect("selecionar_pagamento_carrinho")
+
+        taxa_adm = total * Decimal("0.10")
+
+        # Criar pagamento
+        pagamento = E_Pagamento.objects.create(
+            consumidor=consumidor,
+            tipo_pagamento=metodo,
+            preco_total=total,
+            taxa_adm=taxa_adm,
+        )
+
+        # Criar compras individuais
+        for receita in receitas:
+            E_Compra.objects.create(
+                consumidor=consumidor,
+                receita=receita,
+                pagamento=pagamento
+            )
+
+        # Limpar carrinho
+        request.session["carrinho"] = []
+
+        messages.success(request, "Pagamento realizado com sucesso!")
+        return redirect("home")
+
+    return render(request, "F_Tela_Pagamento.html", {
+        "receitas": receitas,
+        "total": total
+    })
+
+
+@login_required
+def minhas_receitas(request):
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem acessar esta página.")
+        return redirect("home")
+
+    compras = E_Compra.objects.filter(consumidor=consumidor).select_related("receita")
+
+    receitas = [compra.receita for compra in compras]
+
+    return render(request, "F_Tela_Minhas_Receitas.html", {
+        "receitas": receitas
+    })
+
+
+

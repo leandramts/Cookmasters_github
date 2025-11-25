@@ -4,34 +4,53 @@
 {% block content %}
 <div class="home-bg">
 
-    <div class="container-auth" style="max-width: 600px; margin: 0 auto;">
+    <div class="container-auth" style="width: 420px;">
 
-        <h1 style="background:#e1a536; padding:10px; border-radius:10px;">
-            Escolher Pagamento
-        </h1>
+        <h1 style="margin-bottom: 25px;">Finalizar Pagamento</h1>
 
-        <p><strong>Receita:</strong> {{ receita.nome }}</p>
-        <p><strong>Preço:</strong> R$ {{ preco }}</p>
+        {% if receitas %}
+            <h3 style="color:#088341; text-align:left;">Itens do Carrinho:</h3>
+
+            <ul style="padding-left: 18px; font-size: 15px; text-align:left;">
+                {% for r in receitas %}
+                    <li style="margin-bottom: 6px; color:#333;">
+                        {{ r.nome }} — <strong>R$ {{ r.preco }}</strong>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="summary-cards" style="margin-top: 25px;">
+                <h3 style="margin:0;">Total da Compra:</h3>
+                <p style="font-size: 18px; font-weight:bold; color:#088341; margin-top:8px;">
+                    R$ {{ total }}
+                </p>
+            </div>
+        {% else %}
+            <p style="text-align:center; color:#555;">
+                Nenhum item encontrado no carrinho.
+            </p>
+        {% endif %}
 
         <form method="POST">
             {% csrf_token %}
 
-            <label>Método de Pagamento:</label>
-            <select name="tipo_pagamento" class="form-control" style="padding:10px; width:100%; border-radius:8px;">
+            <label for="tipo_pagamento">Método de Pagamento:</label>
+            <select name="tipo_pagamento" id="tipo_pagamento"
+                style="padding:10px; border-radius:8px; margin-top:5px; width:100%; border:1px solid #ccc;">
                 <option value="pix">PIX</option>
                 <option value="credito">Cartão de Crédito</option>
                 <option value="debito">Cartão de Débito</option>
             </select>
 
-            <button type="submit" class="botao-link" style="margin-top:25px;">
+            <button type="submit" class="botao-link" style="width:100%; margin-top:25px;">
                 Finalizar Pagamento
             </button>
         </form>
 
-        <a href="{% url 'visualizar_receita' receita.id %}" 
-           class="botao-link" 
-           style="background:#fdd; margin-top:15px;">
-           Cancelar
+        <a href="{% url 'ver_carrinho' %}"
+           class="botao-link"
+           style="background:#ffb3b3; color:#700; margin-top:15px; width:100%;">
+            Cancelar
         </a>
 
     </div>
