@@ -99,56 +99,76 @@ def cadastro_consumidor(request):
         return render(request, 'F_Tela_Cadastro_Consumidor.html')
 
 #UC00 - Cadastrar - quando for Chefe
+# UC00 - Cadastrar Chefe
 def cadastro_chefe(request):
 
     if request.method == 'POST':
+
         nome = request.POST.get('nome')
         email = request.POST.get('email')
         senha = request.POST.get('senha')
         senha_confirm = request.POST.get('senha_confirm')
+
         cpf = request.POST.get('cpf')
         descricao = request.POST.get('descricao')
         foto = request.FILES.get('foto')
 
+        # Novos atributos bancários
+        numero_agencia = request.POST.get('numero_agencia')
+        nome_do_banco = request.POST.get('nome_do_banco')
+        numero_conta = request.POST.get('numero_conta')
+
+        # Validação dos campos obrigatórios
         if not nome or not email or not senha or not senha_confirm or not cpf or not descricao:
-             messages.error(request, "Todos os campos são obrigatórios.")
-             return render(request, 'F_Tela_Cadastro_Chefe.html')
+            messages.error(request, "Todos os campos obrigatórios devem ser preenchidos.")
+            return render(request, 'F_Tela_Cadastro_Chefe.html')
 
         if senha != senha_confirm:
             messages.error(request, "As senhas não são iguais.")
             return render(request, 'F_Tela_Cadastro_Chefe.html')
-        
+
         if E_UsuarioGeral.objects.filter(email=email).exists():
             messages.error(request, "Este e-mail já está em uso.")
             return render(request, 'F_Tela_Cadastro_Chefe.html')
 
+        if E_Chefe.objects.filter(cpf=cpf).exists():
+            messages.error(request, "Já existe um chefe cadastrado com este CPF.")
+            return render(request, 'F_Tela_Cadastro_Chefe.html')
 
         try:
             with transaction.atomic():
 
+                # Criação do usuário geral
                 user = E_UsuarioGeral.objects.create_user(
                     email=email,
                     nome=nome,
                     password=senha
                 )
 
+                # Criação da entidade E_Chefe com os novos atributos
                 E_Chefe.objects.create(
                     usuario=user,
                     cpf=cpf,
-                    descricao = descricao,
-                    foto = foto
+                    descricao=descricao,
+                    foto=foto,
+                    numero_agencia=numero_agencia,
+                    nome_do_banco=nome_do_banco,
+                    Numero_conta=numero_conta
                 )
 
+                # login automático após cadastro
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
             messages.success(request, f'Chefe {nome} cadastrado com sucesso!')
             return redirect('home')
 
         except Exception as e:
-                messages.error(request, f"Ocorreu um erro: {e}")
-                return render(request, 'F_Tela_Cadastro_Chefe.html')
+            messages.error(request, f"Ocorreu um erro: {e}")
+            return render(request, 'F_Tela_Cadastro_Chefe.html')
 
-        # GET
+    # GET
     return render(request, 'F_Tela_Cadastro_Chefe.html')
+
 
 #UC03 - Visualizar Chefe
 
