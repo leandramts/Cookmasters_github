@@ -5,6 +5,14 @@ nav {
 
 }
 
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background-color: #cafb96 !important;  /* fundo verde claro */
+}
+
+
     .hom {
         background-color: #eae168;
     }
@@ -69,11 +77,11 @@ nav :hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 90vh; /* Ajustado para funcionar dentro do base.html */
+    min-height: 90vh; 
     margin: 0;
 }
 
-/* O "cartão" amarelo claro no centro */
+
 .container-auth {
     background-color: #fff9cc;
     padding: 25px 35px;
@@ -83,7 +91,6 @@ nav :hover {
     text-align: center;
 }
 
-/*O título laranja */
 .container-auth h1 {
     background-color: #e1a536;
     color: #333;
@@ -140,7 +147,6 @@ nav :hover {
     background-color: #a0c84f;
 }
 
-/* Bloco para mostrar mensagens de erro/sucesso */
 .messages {
     list-style: none;
     padding: 0;
@@ -232,40 +238,114 @@ nav :hover {
 }
 
 .filtro-box {
-    width: 250px;
-    padding: 15px;
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 15px 25px;
     background: #feee8a;
     border-radius: 8px;
-    margin: 20px 0;
 }
 
-.filtro-box label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
+.filtro-layout-horizontal {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.filtro-box select,
-.filtro-box button {
+.filtro-grupo {
+    flex: 1;
+    min-width: 150px;
+}
+
+.filtro-tags {
+    flex: 2;
+    min-width: 300px;
+}
+
+.filtro-grupo select {
     width: 100%;
-    padding: 6px;
-    margin-top: 5px;
+}
+
+.tag-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 15px;
 }
 
 .tag-box label {
-    display: block;
-    margin-left: 5px;
+    margin-top: 0;
     font-weight: normal;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .btn-filtrar {
-    margin-top: 15px;
-    padding: 8px;
-    background-color: #f3a921;
-    color: white;
-    border: none;
-    border-radius: 6px;
+    align-self: flex-end;
+    padding: 8px 20px;
+    height: 40px;
+    min-width: 100px;
+    margin-top: 0;
+}
+
+.filtro-layout-tags-separado {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed #d46b08;
+}
+
+.filtro-layout-tags-separado label:first-child {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.tag-box-filtro-opcoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 25px;
+}
+
+.tag-checkbox-item {
+    font-weight: bold;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
     cursor: pointer;
+    color: #333;
+    transition: color 0.2s;
+}
+
+.tag-checkbox-item input[type="checkbox"] {
+    transform: scale(1.3);
+    min-width: 18px;
+    height: 18px;
+    margin-top: 0;
+}
+
+.tag-checkbox-item:hover {
+    color: #d46b08;
+}
+
+@media (max-width: 768px) {
+    .filtro-layout-horizontal {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtro-grupo, .filtro-tags {
+        min-width: 100%;
+        flex: none;
+    }
+
+    .btn-filtrar {
+        width: 100%;
+        margin-top: 15px;
+        align-self: auto;
+    }
 }
 
 .container {
@@ -478,4 +558,31 @@ table td a:hover {
 .btn-welcome:hover {
     background-color: #066c36;
     transform: scale(1.05);
+}
+
+#message-container {
+    position: fixed;
+    top: 20px;
+    right: 20px; 
+    width: 350px;
+    z-index: 2000;
+}
+
+.alert {
+    margin-bottom: 12px;
+    padding: 14px 18px;
+}
+
+.errorlist {
+    display: none !important;
+}
+
+.recipe-img {
+    width: 100%;
+    max-width: 280px;   
+    height: 180px;      
+    object-fit: cover;  
+    border-radius: 10px; 
+    display: block;
+    margin: 0 auto 15px auto;
 }

@@ -14,12 +14,7 @@
         {% endif %}
         
         {% csrf_token %}
-        
-        {% for message in messages %}
-            <ul class="messages">
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            </ul>
-        {% endfor %}
+    
         
         <label for="nome">Nome:</label>
         {# 2. PREENCHE CAMPO DE TEXTO #}

@@ -8,14 +8,6 @@
         <form method="post">
             {% csrf_token %}
 
-            {% if messages %}
-                <ul class="messages">
-                {% for message in messages %}
-                    <li class="error">{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-
             <label for="nome">Nome:</label>
             <input type="text" name="nome" id="nome" required>
 

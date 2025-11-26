@@ -34,6 +34,12 @@ def login_view(request):
             messages.error(request, "Por favor, preencha o e-mail e a senha.")
             return render(request, 'F_Tela_Login.html')
 
+        user_obj = E_UsuarioGeral.objects.filter(email=email).first()
+
+        if user_obj and not user_obj.is_active:
+            messages.error(request, "Sua conta está bloqueada. Entre em contato com o suporte.")
+            return render(request, 'F_Tela_Login.html')
+        
         user = authenticate(request, username=email, password=senha)
 
         if user is not None:
@@ -42,6 +48,7 @@ def login_view(request):
         else:
             messages.error(request, "E-mail ou senha inválidos.")
             return render(request, 'F_Tela_Login.html')
+
     else:
         return render(request, 'F_Tela_Login.html')
 
@@ -177,7 +184,19 @@ def visualizar_chefe(request, id):
     chefe = get_object_or_404(E_Chefe, id=id)
     receitas = E_Receita.objects.filter(autor=chefe)
 
-    return render(request, "F_Tela_Visualizar_Chefe.html", {"chefe":chefe, "receitas": receitas})
+    media_nota = receitas.aggregate(avg_nota=Avg('nota'))['avg_nota']
+    
+
+    chefe.Nota = media_nota if media_nota is not None else 0.0
+    chefe.save() 
+    
+    nota_formatada = "{:.1f}".format(chefe.Nota) 
+
+    return render(request, "F_Tela_Visualizar_Chefe.html", {
+        "chefe": chefe, 
+        "receitas": receitas,
+        "nota_chefe": nota_formatada 
+    })
 
 
  #UC15 - Publicar Receitas
@@ -304,13 +323,13 @@ def visualizar_receita(request, receita_id):
 
             # Verifica se já avaliou
             avaliou = E_Avaliacoes.objects.filter(
-                consumidor=consumidor,   # ✅ AGORA ESTÁ CORRETO
+                consumidor=consumidor,   
                 receita=receita
             ).exists()
 
     contexto = {
         'receita': receita,
-        'receita_id': receita.id,   # ✅ ADICIONAR ISTO
+        'receita_id': receita.id,   
         'autor': receita.autor,
         'nome': receita.nome,
         'preco': receita.preco,
@@ -434,6 +453,14 @@ def avaliar_receita(request, receita_id):
         media = E_Avaliacoes.objects.filter(receita=receita).aggregate(avg=Avg('nota'))['avg']
         receita.nota = media
         receita.save()
+
+        chefe = receita.autor 
+        todas_receitas_chefe = E_Receita.objects.filter(autor=chefe)
+        media_chefe = todas_receitas_chefe.aggregate(avg_nota=Avg('nota'))['avg_nota']
+        
+        
+        chefe.Nota = media_chefe if media_chefe is not None else 0.0
+        chefe.save()
 
         messages.success(request, "Avaliação registrada com sucesso!")
         return redirect("visualizar_receita", receita_id=receita_id)
@@ -703,7 +730,6 @@ def pagamento_carrinho(request):
         metodo = request.POST.get("tipo_pagamento")
 
         if metodo not in ["pix", "credito", "debito"]:
-            messages.error(request, "Método de pagamento inválido.")
             return redirect("selecionar_pagamento_carrinho")
 
         taxa_adm = total * Decimal("0.10")
@@ -757,8 +783,9 @@ def minhas_receitas(request):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def listar_usuarios(request):
-    usuarios = E_UsuarioGeral.objects.all()
+    usuarios = E_UsuarioGeral.objects.filter(is_superuser=False)
     return render(request, "F_Tela_ADM_Ver_Usuarios.html", {"usuarios": usuarios})
+
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
