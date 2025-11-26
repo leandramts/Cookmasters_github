@@ -16,7 +16,11 @@
 
         <hr style="margin: 20px 0;">
 
-        <p><strong>Autor:</strong> {{ autor }}</p>
+        <p>Chefe: 
+            <a href="{% url 'visualizar_chefe' receita.autor.id %}">
+                {{ receita.autor.usuario.nome }}
+            </a>
+        </p>
         <p><strong>Preço:</strong> R$ {{ preco }}</p>
         <p><strong>Descrição:</strong><br> {{ descricao }}</p>
 

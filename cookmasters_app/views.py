@@ -361,17 +361,13 @@ def comprar_receita(request, receita_id):
         messages.error(request, "Somente consumidores podem comprar receitas.")
         return redirect("visualizar_receita", receita_id=receita_id)
 
+    # Se já existe compra concluída, não deixar comprar de novo
     if E_Compra.objects.filter(consumidor=consumidor, receita=receita).exists():
         messages.info(request, "Você já comprou esta receita.")
         return redirect("visualizar_receita", receita_id=receita_id)
 
-    E_Compra.objects.create(consumidor=consumidor, receita=receita)
-
-    messages.success(request, "Compra realizada! Modo de preparo liberado.")
-    return redirect("visualizar_receita", receita_id=receita_id)
-
-
-#UC07 - Processar Pagamentos de Compras
+    # Agora apenas redireciona para tela de pagamento
+    return redirect("selecionar_pagamento", receita_id=receita_id)
 
 @login_required
 def selecionar_pagamento(request, receita_id):
@@ -383,6 +379,11 @@ def selecionar_pagamento(request, receita_id):
         messages.error(request, "Somente consumidores podem comprar.")
         return redirect("visualizar_receita", receita_id=receita_id)
 
+    # Evita pagar receita já comprada
+    if E_Compra.objects.filter(consumidor=consumidor, receita=receita).exists():
+        messages.info(request, "Você já comprou esta receita.")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
     if request.method == "POST":
         metodo = request.POST.get("tipo_pagamento")
 
@@ -392,6 +393,7 @@ def selecionar_pagamento(request, receita_id):
 
         taxa_adm = receita.preco * Decimal("0.10")
 
+        # Criar pagamento
         pagamento = E_Pagamento.objects.create(
             consumidor=consumidor,
             tipo_pagamento=metodo,
@@ -399,6 +401,7 @@ def selecionar_pagamento(request, receita_id):
             taxa_adm=taxa_adm,
         )
 
+        # Criar compra vinculada ao pagamento
         E_Compra.objects.create(
             consumidor=consumidor,
             receita=receita,
@@ -412,6 +415,8 @@ def selecionar_pagamento(request, receita_id):
         "receita": receita,
         "preco": receita.preco,
     })
+
+
 
 #UC06 - Deixar avaliações
 
