@@ -388,8 +388,10 @@ def selecionar_pagamento(request, receita_id):
         metodo = request.POST.get("tipo_pagamento")
 
         if metodo not in ["pix", "credito", "debito"]:
-            messages.error(request, "Método de pagamento inválido.")
             return redirect("selecionar_pagamento", receita_id=receita_id)
+        
+        if metodo not in ["pix", "credito", "debito"]:
+            messages.error(request, "Método de pagamento inválido.")
 
         taxa_adm = receita.preco * Decimal("0.10")
 
