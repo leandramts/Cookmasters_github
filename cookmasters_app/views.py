@@ -33,13 +33,14 @@ def escolher_tipo_usuario(request):
 
 
 def cadastro_consumidor(request):
-
+    # 1. Coleta os dados do formulário POST.
     if request.method == 'POST':
         nome = request.POST.get('nome')
         email = request.POST.get('email')
         senha = request.POST.get('senha')
         senha_confirm = request.POST.get('senha_confirm')
         
+        # 2. Validações
         if not nome or not email or not senha or not senha_confirm:
             messages.error(request, "Todos os campos são obrigatórios.")
             return render(request, 'F_Tela_Cadastro_Consumidor.html')
@@ -53,14 +54,15 @@ def cadastro_consumidor(request):
             return render(request, 'F_Tela_Cadastro_Consumidor.html')
 
         try:
+            # 5. Cria o usuário base (E_UsuarioGeral) com a senha criptografada.
             user = E_UsuarioGeral.objects.create_user(
                 email=email,
                 nome=nome,
                 password=senha
             )
-
+# 6. Cria o perfil específico de Consumidor (E_Consumidor) vinculado ao usuário.
             E_Consumidor.objects.create(usuario=user)
-
+# 7. Realiza o login automático do novo usuário e redireciona pra home.
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             messages.success(request, f'Consumidor {nome} cadastrado com sucesso!')
             return redirect('home')
@@ -75,7 +77,7 @@ def cadastro_consumidor(request):
 #UC00 - Cadastrar - quando for Chefe
 # UC00 - Cadastrar Chefe
 def cadastro_chefe(request):
-
+    # 1. Coleta dados do formulário.
     if request.method == 'POST':
 
         nome = request.POST.get('nome')
@@ -87,12 +89,11 @@ def cadastro_chefe(request):
         descricao = request.POST.get('descricao')
         foto = request.FILES.get('foto')
 
-        # Novos atributos bancários
         numero_agencia = request.POST.get('numero_agencia')
         nome_do_banco = request.POST.get('nome_do_banco')
         numero_conta = request.POST.get('numero_conta')
 
-        # Validação dos campos obrigatórios
+        # Validações
         if not nome or not email or not senha or not senha_confirm or not cpf or not descricao:
             messages.error(request, "Todos os campos obrigatórios devem ser preenchidos.")
             return render(request, 'F_Tela_Cadastro_Chefe.html')
@@ -145,21 +146,21 @@ def cadastro_chefe(request):
 
 #UC01 - Fazer Login
 def login_view(request):
-
+    # 1. Coleta e-mail (username) e senha.
     if request.method == 'POST':
         email = request.POST.get('email')
         senha = request.POST.get('password')
-
+    # 2. Validação de preenchimento.
         if not email or not senha:
             messages.error(request, "Por favor, preencha o e-mail e a senha.")
             return render(request, 'F_Tela_Login.html')
-
+    # 3. Busca o objeto usuário para verificar o status de ativo/bloqueado.
         user_obj = E_UsuarioGeral.objects.filter(email=email).first()
-
+     
         if user_obj and not user_obj.is_active:
             messages.error(request, "Sua conta está bloqueada. Entre em contato com o suporte.")
             return render(request, 'F_Tela_Login.html')
-        
+    # 5. Tenta autenticar o usuário (verifica e-mail/senha).    
         user = authenticate(request, username=email, password=senha)
 
         if user is not None:
@@ -180,13 +181,16 @@ def logout_view(request):
 # UC02 - Visualizar Receita
 
 def visualizar_receita(request, receita_id):
+    # 1. Busca a receita pelo ID; retorna 404 se não encontrar.
     receita = get_object_or_404(E_Receita, id=receita_id)
-
+    
+    # Variáveis de controle para a interface do usuário não logado ou não comprador.
     modo_liberado = False
     avaliou = False
 
     consumidor = None
-
+    
+    # 2. Se o usuário estiver logado, tenta obter seu perfil de Consumidor.
     if request.user.is_authenticated:
         consumidor = E_Consumidor.objects.filter(usuario=request.user).first()
 
@@ -203,6 +207,7 @@ def visualizar_receita(request, receita_id):
                 receita=receita
             ).exists()
 
+    # 5. Constrói o contexto com todos os dados da receita e flags de acesso.
     contexto = {
         'receita': receita,
         'receita_id': receita.id,   
@@ -226,14 +231,16 @@ def visualizar_receita(request, receita_id):
 
 @login_required
 def minhas_receitas(request):
+    # 1. Tenta obter o perfil de Consumidor do usuário logado.
     try:
         consumidor = E_Consumidor.objects.get(usuario=request.user)
     except E_Consumidor.DoesNotExist:
         messages.error(request, "Somente consumidores podem acessar esta página.")
         return redirect("home")
-
+    # 2. Busca todas as compras concluídas para o consumidor, otimizando com `select_related` para a Receita.
     compras = E_Compra.objects.filter(consumidor=consumidor).select_related("receita")
-
+    
+    #3. Extrai a lista de objetos Receita das Compras.
     receitas = [compra.receita for compra in compras]
 
     return render(request, "F_Tela_Minhas_Receitas.html", {
@@ -243,12 +250,14 @@ def minhas_receitas(request):
 #UC03 - Visualizar Chefe
 
 def visualizar_chefe(request, id):
+    # 1. Busca o Chefe pelo ID; retorna 404 se não encontrar.
     chefe = get_object_or_404(E_Chefe, id=id)
+    # 2. Obtém todas as receitas publicadas por este Chefe.
     receitas = E_Receita.objects.filter(autor=chefe)
-
+    # 3. Calcula a nota média de todas as suas receitas.
     media_nota = receitas.aggregate(avg_nota=Avg('nota'))['avg_nota']
     
-
+    # 4. Atualiza o campo 'Nota' do objeto Chefe com a média calculada (se houver notas).
     chefe.Nota = media_nota if media_nota is not None else 0.0
     chefe.save() 
     
@@ -261,7 +270,7 @@ def visualizar_chefe(request, id):
     })
 
 
-# UC04 - Selecionar Ingredientes
+# UC04 - Cozinhe-me
 
 def cozinhe_me(request):
 
@@ -305,6 +314,7 @@ def cozinhe_me(request):
 
 @login_required
 def comprar_receita(request, receita_id):
+    # 1. Obtém a Receita a ser comprada.
     receita = get_object_or_404(E_Receita, id=receita_id)
 
     try:
@@ -321,61 +331,12 @@ def comprar_receita(request, receita_id):
     # Agora apenas redireciona para tela de pagamento
     return redirect("selecionar_pagamento", receita_id=receita_id)
 
-@login_required
-def selecionar_pagamento(request, receita_id):
-    receita = get_object_or_404(E_Receita, id=receita_id)
-
-    try:
-        consumidor = E_Consumidor.objects.get(usuario=request.user)
-    except E_Consumidor.DoesNotExist:
-        messages.error(request, "Somente consumidores podem comprar.")
-        return redirect("visualizar_receita", receita_id=receita_id)
-
-    # Evita pagar receita já comprada
-    if E_Compra.objects.filter(consumidor=consumidor, receita=receita).exists():
-        messages.info(request, "Você já comprou esta receita.")
-        return redirect("visualizar_receita", receita_id=receita_id)
-
-    if request.method == "POST":
-        metodo = request.POST.get("tipo_pagamento")
-
-        if metodo not in ["pix", "credito", "debito"]:
-            return redirect("selecionar_pagamento", receita_id=receita_id)
-        
-        if metodo not in ["pix", "credito", "debito"]:
-            messages.error(request, "Método de pagamento inválido.")
-
-        taxa_adm = receita.preco * Decimal("0.10")
-
-        # Criar pagamento
-        pagamento = E_Pagamento.objects.create(
-            consumidor=consumidor,
-            tipo_pagamento=metodo,
-            preco_total=receita.preco,
-            taxa_adm=taxa_adm,
-        )
-
-        # Criar compra vinculada ao pagamento
-        E_Compra.objects.create(
-            consumidor=consumidor,
-            receita=receita,
-            pagamento=pagamento
-        )
-
-        messages.success(request, "Pagamento realizado com sucesso!")
-        return redirect("visualizar_receita", receita_id=receita_id)
-
-    return render(request, "F_Tela_Pagamento.html", {
-        "receita": receita,
-        "preco": receita.preco,
-    })
-
-
 
 #UC06 - Deixar avaliações
 
 @login_required
 def avaliar_receita(request, receita_id):
+    # 1. Obtém a Receita a ser avaliada.
     receita = get_object_or_404(E_Receita, id=receita_id)
 
     # só consumidor pode avaliar
@@ -412,7 +373,8 @@ def avaliar_receita(request, receita_id):
         media = E_Avaliacoes.objects.filter(receita=receita).aggregate(avg=Avg('nota'))['avg']
         receita.nota = media
         receita.save()
-
+        
+        # 8. Atualiza a nota média do Chefe (autor da receita).
         chefe = receita.autor 
         todas_receitas_chefe = E_Receita.objects.filter(autor=chefe)
         media_chefe = todas_receitas_chefe.aggregate(avg_nota=Avg('nota'))['avg_nota']
@@ -429,14 +391,18 @@ def avaliar_receita(request, receita_id):
         "receita": receita
     })
 
-#UC09 - Acessar Receitas Por Filtro
+#UC08 - Acessar Receitas Por Filtro
 def filtro(request):
+    # 1. Coleta os parâmetros de filtro da URL (GET).
     dificuldade = request.GET.get('dificuldade', '')
     tempo_preparo = request.GET.get('tempo', '')
     tags = request.GET.getlist('tags')
 
+    #Incia com todos as tags e receitas
     receitas = E_Receita.objects.all()
     todas_tags = E_Tag.objects.all()
+    
+    #Aplica os filtros
     if dificuldade:
         receitas = receitas.filter(dificuldade=dificuldade)
     
@@ -462,6 +428,7 @@ def filtro(request):
 
     todas_tags = E_Tag.objects.all()
 
+    # Renderiza a tela 'home.html' com os resultados filtrados e os filtros selecionados.
     return render (request, 'home.html', 
     {
         'receitas': receitas,
@@ -472,40 +439,99 @@ def filtro(request):
 
     })
 
+#UC07 -  Processar Pagamento de Compras.
 @login_required
-def adicionar_ao_carrinho(request, receita_id):
+def selecionar_pagamento(request, receita_id):
+    # 1. Obtém a Receita a ser paga.
     receita = get_object_or_404(E_Receita, id=receita_id)
 
     try:
+        # 2. Verifica se o usuário logado é um Consumidor.
         consumidor = E_Consumidor.objects.get(usuario=request.user)
     except E_Consumidor.DoesNotExist:
         messages.error(request, "Somente consumidores podem comprar.")
         return redirect("visualizar_receita", receita_id=receita_id)
 
+    # Evita pagar receita já comprada
+    if E_Compra.objects.filter(consumidor=consumidor, receita=receita).exists():
+        messages.info(request, "Você já comprou esta receita.")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    if request.method == "POST":
+        # 4. Coleta o método de pagamento.
+        metodo = request.POST.get("tipo_pagamento")
+
+        if metodo not in ["pix", "credito", "debito"]:
+            return redirect("selecionar_pagamento", receita_id=receita_id)
+        
+        if metodo not in ["pix", "credito", "debito"]:
+            messages.error(request, "Método de pagamento inválido.")
+
+        taxa_adm = receita.preco * Decimal("0.10")
+
+        # Criar pagamento
+        pagamento = E_Pagamento.objects.create(
+            consumidor=consumidor,
+            tipo_pagamento=metodo,
+            preco_total=receita.preco,
+            taxa_adm=taxa_adm,
+        )
+
+        # Criar compra vinculada ao pagamento
+        E_Compra.objects.create(
+            consumidor=consumidor,
+            receita=receita,
+            pagamento=pagamento
+        )
+
+        messages.success(request, "Pagamento realizado com sucesso!")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    return render(request, "F_Tela_Pagamento.html", {
+        "receita": receita,
+        "preco": receita.preco,
+    })
+
+#UC09 - Carrinho
+
+@login_required
+def adicionar_ao_carrinho(request, receita_id):
+    # 1. Obtém a Receita.
+    receita = get_object_or_404(E_Receita, id=receita_id)
+    # 2. Verifica se o usuário é Consumidor (necessário para Carrinho/Compra).
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar.")
+        return redirect("visualizar_receita", receita_id=receita_id)
+    # 3. Obtém o carrinho da sessão ou cria um novo (lista de IDs).
     carrinho = request.session.get("carrinho", [])
 
+    # 4. Adiciona a receita ao carrinho se ainda não estiver lá.
     if receita_id not in carrinho:
         carrinho.append(receita_id)
         request.session["carrinho"] = carrinho
         messages.success(request, "Receita adicionada ao carrinho!")
     else:
         messages.info(request, "Esta receita já está no carrinho.")
-
+    # 6. Redireciona para a tela do carrinho.
     return redirect("ver_carrinho")
 
 @login_required
 def ver_carrinho(request):
+    # 1. Verifica se o usuário é Consumidor.
     try:
         consumidor = E_Consumidor.objects.get(usuario=request.user)
     except E_Consumidor.DoesNotExist:
         messages.error(request, "Somente consumidores podem comprar.")
         return redirect("home")
-
+    # 2. Obtém a lista de IDs de receitas do carrinho da sessão.
     carrinho = request.session.get("carrinho", [])
-
+    # 3. Busca os objetos Receita correspondentes aos IDs.
     receitas = E_Receita.objects.filter(id__in=carrinho)
+    # 4. Calcula o preço total dos itens.
     total = sum(r.preco for r in receitas)
-
+    # 5. Renderiza a tela do carrinho.
     return render(request, "F_Tela_Carrinho.html", {
         "receitas": receitas,
         "total": total
@@ -513,21 +539,23 @@ def ver_carrinho(request):
 
 @login_required
 def remover_do_carrinho(request, receita_id):
+    # 1. Verifica se o usuário é Consumidor.
     try:
         consumidor = E_Consumidor.objects.get(usuario=request.user)
     except E_Consumidor.DoesNotExist:
         messages.error(request, "Somente consumidores podem comprar.")
         return redirect("home")
-
+    # 2. Obtém a lista de IDs do carrinho da sessão.
     carrinho = request.session.get("carrinho", [])
-
+    # 3. Remove a receita da lista se ela existir.
     if receita_id in carrinho:
         carrinho.remove(receita_id)
+        # 4. Salva a lista atualizada de volta na sessão.
         request.session["carrinho"] = carrinho
         messages.success(request, "Receita removida do carrinho.")
     else:
         messages.info(request, "Essa receita não estava no carrinho.")
-
+    # 5. Redireciona para a tela do carrinho.
     return redirect("ver_carrinho")
 
 
@@ -546,11 +574,13 @@ def pagamento_carrinho(request):
     if not carrinho:
         messages.info(request, "Seu carrinho está vazio.")
         return redirect("ver_carrinho")
-
+    
+     # Obtém as receitas e calcula o total.
     receitas = E_Receita.objects.filter(id__in=carrinho)
     total = sum(r.preco for r in receitas)
 
     if request.method == "POST":
+        # 5. Coleta e valida o método de pagamento.
         metodo = request.POST.get("tipo_pagamento")
 
         if metodo not in ["pix", "credito", "debito"]:
@@ -558,7 +588,7 @@ def pagamento_carrinho(request):
 
         taxa_adm = total * Decimal("0.10")
 
-        # Criar pagamento
+        # Cria o registro de Pagamento para o TOTAL do carrinho.
         pagamento = E_Pagamento.objects.create(
             consumidor=consumidor,
             tipo_pagamento=metodo,
@@ -585,7 +615,7 @@ def pagamento_carrinho(request):
         "total": total
     })
 
-#UC15 - Publicar Receitas
+#UC13 - Publicar Receitas
 
 @login_required
 def cadastrar_receita(request):
@@ -646,17 +676,18 @@ def cadastrar_receita(request):
     })
 
 
-# UC16 - Gerar Relatório de Vendas para Chefe
+# UC14 - Gerar Relatório de Vendas para Chefe
 @login_required
 def relatorio_vendas_chefe(request):
     try:
+        # 1. Verifica se o usuário logado é um Chefe.
         chefe = E_Chefe.objects.get(usuario=request.user)
     except E_Chefe.DoesNotExist:
         messages.error(request, "Acesso negado. Apenas Chefes podem visualizar relatórios de vendas.")
         return redirect('home')
 
     TAXA_ADM = Decimal("0.10")
-    
+    # 2. Cria o queryset para o relatório, anotando os campos calculados:
     relatorio = E_Receita.objects.filter(autor=chefe).annotate(
         
         total_vendas=Count('vendas'),
@@ -695,11 +726,13 @@ def relatorio_vendas_chefe(request):
     return render(request, 'F_Tela_Relatorio_Vendas.html', context)
 
 
-#UC17 - Editar/Excluir Receita
+#UC16 - Editar  Receita
 @login_required
 def editar_receita(request, receita_id):
+    # 1. Obtém a Receita a ser excluída.
     receita = get_object_or_404(E_Receita, id=receita_id)
     
+    # 2. Verifica se o usuário logado é um Chefe.
     try:
         chefe_logado = E_Chefe.objects.get(usuario=request.user)
     except E_Chefe.DoesNotExist:
@@ -711,6 +744,7 @@ def editar_receita(request, receita_id):
         return redirect('visualizar_receita', receita_id=receita_id)
 
     if request.method == 'POST':
+        # 4. Atualiza os campos simples da Receita com os dados do POST.
         receita.nome = request.POST.get('nome')
         receita.descricao = request.POST.get('descricao')
         receita.preco = request.POST.get('preco')
@@ -727,14 +761,15 @@ def editar_receita(request, receita_id):
         except (ValueError, TypeError):
             pass
 
-        receita.save()
-
+        receita.save() # Salva as alterações na Receita.
+        
+        # 7. Atualiza Tags (limpa as existentes e adiciona as novas).
         tags_selecionadas = request.POST.getlist('tags')
         receita.tags.clear()
         for nome_tag in tags_selecionadas:
             tag, _ = E_Tag.objects.get_or_create(nome=nome_tag)
             receita.tags.add(tag)
-
+        # 8. Atualiza Ingredientes (limpa os existentes e adiciona os novos).
         ingredientes_texto = request.POST.get('ingredientes', '')
         ingredientes_lista = [i.strip() for i in ingredientes_texto.split(',') if i.strip()]
         receita.ingredientes.clear()
@@ -756,7 +791,7 @@ def editar_receita(request, receita_id):
     return render(request, 'F_Tela_Cadastro_Receita.html', context)
 
 
-#UC17 - Editar/Excluir Receita
+#UC11 - Excluir Receita
 
 @login_required
 def chefe_excluir_receita(request, receita_id):
@@ -781,15 +816,17 @@ def chefe_excluir_receita(request, receita_id):
     return redirect('visualizar_receita', receita_id=receita_id)
 
 
-#UC11 - Gerenciar Usuários
+#UC10 - Gerenciar Usuários
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def listar_usuarios(request):
+    # 2. Lista todos os usuários gerais, excluindo outros Superusuários (o próprio admin).
     usuarios = E_UsuarioGeral.objects.filter(is_superuser=False)
     return render(request, "F_Tela_ADM_Ver_Usuarios.html", {"usuarios": usuarios})
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
+# 3. Executa a ação (bloquear ou desbloquear) atualizando o campo `is_active`.
 def gerenciar_usuario(request, user_id, acao):
     user = get_object_or_404(E_UsuarioGeral, id=user_id)
 
@@ -808,10 +845,11 @@ def gerenciar_usuario(request, user_id, acao):
 
     return redirect("listar_usuarios") 
 
-#UC12 - Gerenciar conteúdos
+#UC12 - Gerenciar receitas
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def listar_receitas(request):
+    # 2. Lista todas as receitas, otimizando a consulta para incluir o autor (`select_related`).
     receitas = E_Receita.objects.all().select_related("autor")
     return render(request, "F_Tela_ADM_Ver_Receitas.html", {"receitas": receitas})
 
@@ -824,9 +862,11 @@ def adm_excluir_receita(request, receita_id):
     messages.success(request, "Receita excluída.")
     return redirect("listar_receitas")
 
+#UC13 - Gerenciar comentarios
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def listar_comentarios(request):
+    # 2. Lista todos os comentários, otimizando a consulta para incluir a Receita e o Consumidor.
     comentarios = E_Avaliacoes.objects.all().select_related("receita", "consumidor")
     return render(request, "F_Tela_ADM_Ver_Comentarios.html", {"comentarios": comentarios})
 
