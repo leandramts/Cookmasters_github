@@ -49,11 +49,13 @@
 
                 <td>
                     {% if user.is_active %}
-                        <a href="{% url 'bloquear_usuario' user.id %}" class="btn btn-danger btn-sm">
+                        <a href="{% url 'gerenciar_usuario' user.id 'bloquear' %}" 
+                           class="btn btn-danger btn-sm">
                             Bloquear
                         </a>
                     {% else %}
-                        <a href="{% url 'desbloquear_usuario' user.id %}" class="btn btn-success btn-sm">
+                        <a href="{% url 'gerenciar_usuario' user.id 'desbloquear' %}" 
+                           class="btn btn-success btn-sm">
                             Desbloquear
                         </a>
                     {% endif %}

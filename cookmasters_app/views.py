@@ -794,24 +794,25 @@ def listar_usuarios(request):
     usuarios = E_UsuarioGeral.objects.filter(is_superuser=False)
     return render(request, "F_Tela_ADM_Ver_Usuarios.html", {"usuarios": usuarios})
 
-
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
-def bloquear_usuario(request, user_id):
+def gerenciar_usuario(request, user_id, acao):
     user = get_object_or_404(E_UsuarioGeral, id=user_id)
-    user.is_active = False
-    user.save()
-    messages.success(request, "Usuário bloqueado com sucesso.")
-    return redirect("listar_usuarios")
 
-@login_required
-@user_passes_test(lambda u: u.is_superuser)
-def desbloquear_usuario(request, user_id):
-    user = get_object_or_404(E_UsuarioGeral, id=user_id)
-    user.is_active = True
-    user.save()
-    messages.success(request, "Usuário desbloqueado com sucesso.")
-    return redirect("listar_usuarios")
+    if acao == "bloquear":
+        user.is_active = False
+        user.save()
+        messages.success(request, "Usuário bloqueado com sucesso.")
+
+    elif acao == "desbloquear":
+        user.is_active = True
+        user.save()
+        messages.success(request, "Usuário desbloqueado com sucesso.")
+
+    else:
+        messages.error(request, "Ação inválida.")
+
+    return redirect("listar_usuarios") 
 
 #UC12 - Gerenciar conteúdos
 @login_required
@@ -831,14 +832,14 @@ def adm_excluir_receita(request, receita_id):
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
+def listar_comentarios(request):
+    comentarios = E_Avaliacoes.objects.all().select_related("receita", "consumidor")
+    return render(request, "F_Tela_ADM_Ver_Comentarios.html", {"comentarios": comentarios})
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def excluir_comentario(request, comentario_id):
     comentario = get_object_or_404(E_Avaliacoes, id=comentario_id)
     comentario.delete()
     messages.success(request, "Comentário removido.")
     return redirect("listar_comentarios")
-
-@login_required
-@user_passes_test(lambda u: u.is_superuser)
-def listar_comentarios(request):
-    comentarios = E_Avaliacoes.objects.all().select_related("receita", "consumidor")
-    return render(request, "F_Tela_ADM_Ver_Comentarios.html", {"comentarios": comentarios})

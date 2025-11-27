@@ -41,8 +41,7 @@ urlpatterns = [
     path("carrinho/pagar/", views.pagamento_carrinho, name="pagamento_carrinho"),
 
     path("adm/usuarios/", views.listar_usuarios, name="listar_usuarios"),
-    path("adm/usuarios/bloquear/<int:user_id>/", views.bloquear_usuario, name="bloquear_usuario"),
-    path("adm/usuarios/desbloquear/<int:user_id>/", views.desbloquear_usuario, name="desbloquear_usuario"),
+    path("adm/usuarios/<int:user_id>/<str:acao>/", views.gerenciar_usuario, name="gerenciar_usuario"),
 
     path("adm/receitas/", views.listar_receitas, name="listar_receitas"),
     path("adm/receitas/excluir/<int:receita_id>/", views.adm_excluir_receita, name="adm_excluir_receita"),
