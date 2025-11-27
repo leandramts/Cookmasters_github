@@ -23,40 +23,6 @@ def home_view(request):
         'selecionadas_tags': [],
     })
 
-#UC01 - Fazer Login
-def login_view(request):
-
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        senha = request.POST.get('password')
-
-        if not email or not senha:
-            messages.error(request, "Por favor, preencha o e-mail e a senha.")
-            return render(request, 'F_Tela_Login.html')
-
-        user_obj = E_UsuarioGeral.objects.filter(email=email).first()
-
-        if user_obj and not user_obj.is_active:
-            messages.error(request, "Sua conta está bloqueada. Entre em contato com o suporte.")
-            return render(request, 'F_Tela_Login.html')
-        
-        user = authenticate(request, username=email, password=senha)
-
-        if user is not None:
-            login(request, user)
-            return redirect('home')
-        else:
-            messages.error(request, "E-mail ou senha inválidos.")
-            return render(request, 'F_Tela_Login.html')
-
-    else:
-        return render(request, 'F_Tela_Login.html')
-
-@login_required
-def logout_view(request):
-    logout(request)
-    return redirect('home')
-
 #UC00 - Cadastrar
 
 def escolher_tipo_usuario(request):
@@ -177,129 +143,39 @@ def cadastro_chefe(request):
     # GET
     return render(request, 'F_Tela_Cadastro_Chefe.html')
 
+#UC01 - Fazer Login
+def login_view(request):
 
-#UC03 - Visualizar Chefe
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        senha = request.POST.get('password')
 
-def visualizar_chefe(request, id):
-    chefe = get_object_or_404(E_Chefe, id=id)
-    receitas = E_Receita.objects.filter(autor=chefe)
+        if not email or not senha:
+            messages.error(request, "Por favor, preencha o e-mail e a senha.")
+            return render(request, 'F_Tela_Login.html')
 
-    media_nota = receitas.aggregate(avg_nota=Avg('nota'))['avg_nota']
-    
+        user_obj = E_UsuarioGeral.objects.filter(email=email).first()
 
-    chefe.Nota = media_nota if media_nota is not None else 0.0
-    chefe.save() 
-    
-    nota_formatada = "{:.1f}".format(chefe.Nota) 
+        if user_obj and not user_obj.is_active:
+            messages.error(request, "Sua conta está bloqueada. Entre em contato com o suporte.")
+            return render(request, 'F_Tela_Login.html')
+        
+        user = authenticate(request, username=email, password=senha)
 
-    return render(request, "F_Tela_Visualizar_Chefe.html", {
-        "chefe": chefe, 
-        "receitas": receitas,
-        "nota_chefe": nota_formatada 
-    })
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, "E-mail ou senha inválidos.")
+            return render(request, 'F_Tela_Login.html')
 
-
- #UC15 - Publicar Receitas
+    else:
+        return render(request, 'F_Tela_Login.html')
 
 @login_required
-def cadastrar_receita(request):
-    if request.method == 'POST':
-        try:
-
-            # Pegando os dados enviados pela F_Tela_Cadastro_Receita
-
-            autor = E_Chefe.objects.get(usuario=request.user)
-            nome = request.POST.get('nome')
-            descricao = request.POST.get('descricao')
-            preco = request.POST.get('preco')
-            modo_de_preparo = request.POST.get('modo_de_preparo')
-            tags_selecionadas = request.POST.getlist('tags')
-            ingredientes_texto = request.POST.get('ingredientes', '')
-            tempo_preparo = request.POST.get('tempo_preparo')
-            dificuldade = request.POST.get('dificuldade')
-            foto = request.FILES.get('foto_receita')
-
-
-            # Criar um objeto da classe E_Receita
-            receita = E_Receita.objects.create(
-                autor=autor,
-                nome=nome,
-                descricao=descricao,
-                preco=preco,
-                modo_de_preparo=modo_de_preparo,
-                foto=foto,
-                tempo_preparo = tempo_preparo,
-                dificuldade = dificuldade
-
-            )
-
-            # Adicionar tags
-            for nome_tag in tags_selecionadas:
-                tag, _ = E_Tag.objects.get_or_create(nome=nome_tag)
-                receita.tags.add(tag)
-
-            # Criando uma instância da classe E_ingrediente e relacionando-os com a receita
-            ingredientes_lista = [i.strip() for i in ingredientes_texto.split(',') if i.strip()]
-            for nome_ingrediente in ingredientes_lista:
-                ingrediente, _ = E_Ingrediente.objects.get_or_create(nome=nome_ingrediente)
-                receita.ingredientes.add(ingrediente)
-
-            messages.success(request, 'Receita cadastrada com sucesso!')
-            return redirect('home')
-
-        except E_Chefe.DoesNotExist:
-            messages.error(request, "Você precisa ser um Chefe para cadastrar receitas.")
-            return redirect('home')
-
-        except Exception as e:
-            messages.error(request, f"Ocorreu um erro: {e}")
-
-    # Passa as tags padrão para o HTML
-    return render(request, 'F_Tela_Cadastro_Receita.html', {
-        'tags': E_Receita.TAGS_PADRAO
-    })
-
-
-
-
-# UC04 - Selecionar Ingredientes
-
-def cozinhe_me(request):
-
-    # Lista completa de ingredientes, ordenados
-    ingredientes = E_Ingrediente.objects.all().order_by("nome")
-
-    # Ingredientes selecionados (vêm dos checkboxes) na tela de F_Tela_CozinheMe
-    selecionados_ids = request.POST.getlist("ingredientes")
-    ingredientes_selecionados = E_Ingrediente.objects.filter(id__in=selecionados_ids)
-
-    receitas = []
-
-    if ingredientes_selecionados:
-        # Receitas que possuam pelo menos um ingrediente selecionado
-        receitas_possiveis = (
-            E_Receita.objects
-            .filter(ingredientes__in=ingredientes_selecionados)
-            .distinct()
-        )
-
-        # Conjunto dos ingredientes selecionados
-        conjunto_selecionado = set(ingredientes_selecionados)
-
-        # Guarda as receitas cujo seu conjunto de ingredientes é subconjunto dos conjunto dos ingredientes selecionados 
-        receitas = [
-            r for r in receitas_possiveis
-            if set(r.ingredientes.all()).issubset(conjunto_selecionado)
-        ]
-
-    # Guarda os ingredientes, os ingredientes selecionados e as receitas resultantes para mostrar na F_Tela_CozinheMe.html
-    context = {
-        "ingredientes": ingredientes,
-        "ingredientes_selecionados": ingredientes_selecionados,
-        "receitas": receitas,
-    }
-
-    return render(request, "F_Tela_CozinheMe.html", context)
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 # UC02 - Visualizar Receita
 
@@ -347,6 +223,82 @@ def visualizar_receita(request, receita_id):
 
 
     return render(request, 'F_Tela_Visualizar_Receita.html', contexto)
+
+@login_required
+def minhas_receitas(request):
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem acessar esta página.")
+        return redirect("home")
+
+    compras = E_Compra.objects.filter(consumidor=consumidor).select_related("receita")
+
+    receitas = [compra.receita for compra in compras]
+
+    return render(request, "F_Tela_Minhas_Receitas.html", {
+        "receitas": receitas
+    })
+
+#UC03 - Visualizar Chefe
+
+def visualizar_chefe(request, id):
+    chefe = get_object_or_404(E_Chefe, id=id)
+    receitas = E_Receita.objects.filter(autor=chefe)
+
+    media_nota = receitas.aggregate(avg_nota=Avg('nota'))['avg_nota']
+    
+
+    chefe.Nota = media_nota if media_nota is not None else 0.0
+    chefe.save() 
+    
+    nota_formatada = "{:.1f}".format(chefe.Nota) 
+
+    return render(request, "F_Tela_Visualizar_Chefe.html", {
+        "chefe": chefe, 
+        "receitas": receitas,
+        "nota_chefe": nota_formatada 
+    })
+
+
+# UC04 - Selecionar Ingredientes
+
+def cozinhe_me(request):
+
+    # Lista completa de ingredientes, ordenados
+    ingredientes = E_Ingrediente.objects.all().order_by("nome")
+
+    # Ingredientes selecionados (vêm dos checkboxes) na tela de F_Tela_CozinheMe
+    selecionados_ids = request.POST.getlist("ingredientes")
+    ingredientes_selecionados = E_Ingrediente.objects.filter(id__in=selecionados_ids)
+
+    receitas = []
+
+    if ingredientes_selecionados:
+        # Receitas que possuam pelo menos um ingrediente selecionado
+        receitas_possiveis = (
+            E_Receita.objects
+            .filter(ingredientes__in=ingredientes_selecionados)
+            .distinct()
+        )
+
+        # Conjunto dos ingredientes selecionados
+        conjunto_selecionado = set(ingredientes_selecionados)
+
+        # Guarda as receitas cujo seu conjunto de ingredientes é subconjunto dos conjunto dos ingredientes selecionados 
+        receitas = [
+            r for r in receitas_possiveis
+            if set(r.ingredientes.all()).issubset(conjunto_selecionado)
+        ]
+
+    # Guarda os ingredientes, os ingredientes selecionados e as receitas resultantes para mostrar na F_Tela_CozinheMe.html
+    context = {
+        "ingredientes": ingredientes,
+        "ingredientes_selecionados": ingredientes_selecionados,
+        "receitas": receitas,
+    }
+
+    return render(request, "F_Tela_CozinheMe.html", context)
 
 
 #UC05 - Comprar Receitas
@@ -520,6 +472,180 @@ def filtro(request):
 
     })
 
+@login_required
+def adicionar_ao_carrinho(request, receita_id):
+    receita = get_object_or_404(E_Receita, id=receita_id)
+
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar.")
+        return redirect("visualizar_receita", receita_id=receita_id)
+
+    carrinho = request.session.get("carrinho", [])
+
+    if receita_id not in carrinho:
+        carrinho.append(receita_id)
+        request.session["carrinho"] = carrinho
+        messages.success(request, "Receita adicionada ao carrinho!")
+    else:
+        messages.info(request, "Esta receita já está no carrinho.")
+
+    return redirect("ver_carrinho")
+
+@login_required
+def ver_carrinho(request):
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar.")
+        return redirect("home")
+
+    carrinho = request.session.get("carrinho", [])
+
+    receitas = E_Receita.objects.filter(id__in=carrinho)
+    total = sum(r.preco for r in receitas)
+
+    return render(request, "F_Tela_Carrinho.html", {
+        "receitas": receitas,
+        "total": total
+    })
+
+@login_required
+def remover_do_carrinho(request, receita_id):
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar.")
+        return redirect("home")
+
+    carrinho = request.session.get("carrinho", [])
+
+    if receita_id in carrinho:
+        carrinho.remove(receita_id)
+        request.session["carrinho"] = carrinho
+        messages.success(request, "Receita removida do carrinho.")
+    else:
+        messages.info(request, "Essa receita não estava no carrinho.")
+
+    return redirect("ver_carrinho")
+
+
+@login_required
+def pagamento_carrinho(request):
+    # Verifica se é consumidor
+    try:
+        consumidor = E_Consumidor.objects.get(usuario=request.user)
+    except E_Consumidor.DoesNotExist:
+        messages.error(request, "Somente consumidores podem comprar.")
+        return redirect("home")
+
+    # Carrinho armazenado na sessão
+    carrinho = request.session.get("carrinho", [])
+
+    if not carrinho:
+        messages.info(request, "Seu carrinho está vazio.")
+        return redirect("ver_carrinho")
+
+    receitas = E_Receita.objects.filter(id__in=carrinho)
+    total = sum(r.preco for r in receitas)
+
+    if request.method == "POST":
+        metodo = request.POST.get("tipo_pagamento")
+
+        if metodo not in ["pix", "credito", "debito"]:
+            return redirect("selecionar_pagamento_carrinho")
+
+        taxa_adm = total * Decimal("0.10")
+
+        # Criar pagamento
+        pagamento = E_Pagamento.objects.create(
+            consumidor=consumidor,
+            tipo_pagamento=metodo,
+            preco_total=total,
+            taxa_adm=taxa_adm,
+        )
+
+        # Criar compras individuais
+        for receita in receitas:
+            E_Compra.objects.create(
+                consumidor=consumidor,
+                receita=receita,
+                pagamento=pagamento
+            )
+
+        # Limpar carrinho
+        request.session["carrinho"] = []
+
+        messages.success(request, "Pagamento realizado com sucesso!")
+        return redirect("home")
+
+    return render(request, "F_Tela_Pagamento.html", {
+        "receitas": receitas,
+        "total": total
+    })
+
+#UC15 - Publicar Receitas
+
+@login_required
+def cadastrar_receita(request):
+    if request.method == 'POST':
+        try:
+
+            # Pegando os dados enviados pela F_Tela_Cadastro_Receita
+
+            autor = E_Chefe.objects.get(usuario=request.user)
+            nome = request.POST.get('nome')
+            descricao = request.POST.get('descricao')
+            preco = request.POST.get('preco')
+            modo_de_preparo = request.POST.get('modo_de_preparo')
+            tags_selecionadas = request.POST.getlist('tags')
+            ingredientes_texto = request.POST.get('ingredientes', '')
+            tempo_preparo = request.POST.get('tempo_preparo')
+            dificuldade = request.POST.get('dificuldade')
+            foto = request.FILES.get('foto_receita')
+
+
+            # Criar um objeto da classe E_Receita
+            receita = E_Receita.objects.create(
+                autor=autor,
+                nome=nome,
+                descricao=descricao,
+                preco=preco,
+                modo_de_preparo=modo_de_preparo,
+                foto=foto,
+                tempo_preparo = tempo_preparo,
+                dificuldade = dificuldade
+
+            )
+
+            # Adicionar tags
+            for nome_tag in tags_selecionadas:
+                tag, _ = E_Tag.objects.get_or_create(nome=nome_tag)
+                receita.tags.add(tag)
+
+            # Criando uma instância da classe E_ingrediente e relacionando-os com a receita
+            ingredientes_lista = [i.strip() for i in ingredientes_texto.split(',') if i.strip()]
+            for nome_ingrediente in ingredientes_lista:
+                ingrediente, _ = E_Ingrediente.objects.get_or_create(nome=nome_ingrediente)
+                receita.ingredientes.add(ingrediente)
+
+            messages.success(request, 'Receita cadastrada com sucesso!')
+            return redirect('home')
+
+        except E_Chefe.DoesNotExist:
+            messages.error(request, "Você precisa ser um Chefe para cadastrar receitas.")
+            return redirect('home')
+
+        except Exception as e:
+            messages.error(request, f"Ocorreu um erro: {e}")
+
+    # Passa as tags padrão para o HTML
+    return render(request, 'F_Tela_Cadastro_Receita.html', {
+        'tags': E_Receita.TAGS_PADRAO
+    })
+
+
 # UC16 - Gerar Relatório de Vendas para Chefe
 @login_required
 def relatorio_vendas_chefe(request):
@@ -653,138 +779,6 @@ def chefe_excluir_receita(request, receita_id):
         return redirect('home')  
 
     return redirect('visualizar_receita', receita_id=receita_id)
-
-#Caso de Uso - Carrinho
-
-@login_required
-def adicionar_ao_carrinho(request, receita_id):
-    receita = get_object_or_404(E_Receita, id=receita_id)
-
-    try:
-        consumidor = E_Consumidor.objects.get(usuario=request.user)
-    except E_Consumidor.DoesNotExist:
-        messages.error(request, "Somente consumidores podem comprar.")
-        return redirect("visualizar_receita", receita_id=receita_id)
-
-    carrinho = request.session.get("carrinho", [])
-
-    if receita_id not in carrinho:
-        carrinho.append(receita_id)
-        request.session["carrinho"] = carrinho
-        messages.success(request, "Receita adicionada ao carrinho!")
-    else:
-        messages.info(request, "Esta receita já está no carrinho.")
-
-    return redirect("ver_carrinho")
-
-@login_required
-def ver_carrinho(request):
-    try:
-        consumidor = E_Consumidor.objects.get(usuario=request.user)
-    except E_Consumidor.DoesNotExist:
-        messages.error(request, "Somente consumidores podem comprar.")
-        return redirect("home")
-
-    carrinho = request.session.get("carrinho", [])
-
-    receitas = E_Receita.objects.filter(id__in=carrinho)
-    total = sum(r.preco for r in receitas)
-
-    return render(request, "F_Tela_Carrinho.html", {
-        "receitas": receitas,
-        "total": total
-    })
-
-@login_required
-def remover_do_carrinho(request, receita_id):
-    try:
-        consumidor = E_Consumidor.objects.get(usuario=request.user)
-    except E_Consumidor.DoesNotExist:
-        messages.error(request, "Somente consumidores podem comprar.")
-        return redirect("home")
-
-    carrinho = request.session.get("carrinho", [])
-
-    if receita_id in carrinho:
-        carrinho.remove(receita_id)
-        request.session["carrinho"] = carrinho
-        messages.success(request, "Receita removida do carrinho.")
-    else:
-        messages.info(request, "Essa receita não estava no carrinho.")
-
-    return redirect("ver_carrinho")
-
-
-@login_required
-def pagamento_carrinho(request):
-    # Verifica se é consumidor
-    try:
-        consumidor = E_Consumidor.objects.get(usuario=request.user)
-    except E_Consumidor.DoesNotExist:
-        messages.error(request, "Somente consumidores podem comprar.")
-        return redirect("home")
-
-    # Carrinho armazenado na sessão
-    carrinho = request.session.get("carrinho", [])
-
-    if not carrinho:
-        messages.info(request, "Seu carrinho está vazio.")
-        return redirect("ver_carrinho")
-
-    receitas = E_Receita.objects.filter(id__in=carrinho)
-    total = sum(r.preco for r in receitas)
-
-    if request.method == "POST":
-        metodo = request.POST.get("tipo_pagamento")
-
-        if metodo not in ["pix", "credito", "debito"]:
-            return redirect("selecionar_pagamento_carrinho")
-
-        taxa_adm = total * Decimal("0.10")
-
-        # Criar pagamento
-        pagamento = E_Pagamento.objects.create(
-            consumidor=consumidor,
-            tipo_pagamento=metodo,
-            preco_total=total,
-            taxa_adm=taxa_adm,
-        )
-
-        # Criar compras individuais
-        for receita in receitas:
-            E_Compra.objects.create(
-                consumidor=consumidor,
-                receita=receita,
-                pagamento=pagamento
-            )
-
-        # Limpar carrinho
-        request.session["carrinho"] = []
-
-        messages.success(request, "Pagamento realizado com sucesso!")
-        return redirect("home")
-
-    return render(request, "F_Tela_Pagamento.html", {
-        "receitas": receitas,
-        "total": total
-    })
-
-#Caso de Uso - Visualizar Receitas Compradas
-@login_required
-def minhas_receitas(request):
-    try:
-        consumidor = E_Consumidor.objects.get(usuario=request.user)
-    except E_Consumidor.DoesNotExist:
-        messages.error(request, "Somente consumidores podem acessar esta página.")
-        return redirect("home")
-
-    compras = E_Compra.objects.filter(consumidor=consumidor).select_related("receita")
-
-    receitas = [compra.receita for compra in compras]
-
-    return render(request, "F_Tela_Minhas_Receitas.html", {
-        "receitas": receitas
-    })
 
 
 #UC11 - Gerenciar Usuários
