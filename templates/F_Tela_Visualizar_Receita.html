@@ -35,7 +35,7 @@
                 </span>
             </p>
 
-            <!-- ⭐ BOTÃO DE ADICIONAR AO CARRINHO ⭐ -->
+            
             {% if user.is_authenticated and not modo_liberado %}
                 <a href="{% url 'adicionar_ao_carrinho' receita.id %}"
                    class="botao-link" 
@@ -44,7 +44,7 @@
                 </a>
             {% endif %}
 
-            <!-- ⭐ BOTÃO DE COMPRA DIRETA ⭐ -->
+            
             <form method="POST" action="{% url 'selecionar_pagamento' receita_id %}">
 
                 {% csrf_token %}
