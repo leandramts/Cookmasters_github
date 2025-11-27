@@ -317,7 +317,7 @@ def comprar_receita(request, receita_id):
     if E_Compra.objects.filter(consumidor=consumidor, receita=receita).exists():
         messages.info(request, "Você já comprou esta receita.")
         return redirect("visualizar_receita", receita_id=receita_id)
-
+    
     # Agora apenas redireciona para tela de pagamento
     return redirect("selecionar_pagamento", receita_id=receita_id)
 

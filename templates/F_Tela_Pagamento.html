@@ -8,28 +8,47 @@
 
         <h1 style="margin-bottom: 25px;">Finalizar Pagamento</h1>
 
-        {% if receitas %}
-            <h3 style="color:#088341; text-align:left;">Itens do Carrinho:</h3>
+        {% if receita %}
+    <h3 style="color:#088341; text-align:left;">Receita Selecionada:</h3>
 
-            <ul style="padding-left: 18px; font-size: 15px; text-align:left;">
-                {% for r in receitas %}
-                    <li style="margin-bottom: 6px; color:#333;">
-                        {{ r.nome }} — <strong>R$ {{ r.preco }}</strong>
-                    </li>
-                {% endfor %}
-            </ul>
+    <ul style="padding-left: 18px; font-size: 15px; text-align:left;">
+        <li style="margin-bottom: 6px; color:#333;">
+            {{ receita.nome }} — <strong>R$ {{ receita.preco }}</strong>
+        </li>
+    </ul>
 
-            <div class="summary-cards" style="margin-top: 25px;">
-                <h3 style="margin:0;">Total da Compra:</h3>
-                <p style="font-size: 18px; font-weight:bold; color:#088341; margin-top:8px;">
-                    R$ {{ total }}
-                </p>
-            </div>
-        {% else %}
-            <p style="text-align:center; color:#555;">
-                Nenhum item encontrado no carrinho.
-            </p>
-        {% endif %}
+    <div class="summary-cards" style="margin-top: 25px;">
+        <h3 style="margin:0;">Total da Compra:</h3>
+        <p style="font-size: 18px; font-weight:bold; color:#088341; margin-top:8px;">
+            R$ {{ preco }}
+        </p>
+    </div>
+
+
+{% elif receitas %}
+    <h3 style="color:#088341; text-align:left;">Itens do Carrinho:</h3>
+
+    <ul style="padding-left: 18px; font-size: 15px; text-align:left;">
+        {% for r in receitas %}
+            <li style="margin-bottom: 6px; color:#333;">
+                {{ r.nome }} — <strong>R$ {{ r.preco }}</strong>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="summary-cards" style="margin-top: 25px;">
+        <h3 style="margin:0;">Total da Compra:</h3>
+        <p style="font-size: 18px; font-weight:bold; color:#088341; margin-top:8px;">
+            R$ {{ total }}
+        </p>
+    </div>
+
+{% else %}
+    <p style="text-align:center; color:#555;">
+        Nenhum item encontrado.
+    </p>
+{% endif %}
+
 
         <form method="POST">
             {% csrf_token %}

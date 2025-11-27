@@ -12,33 +12,34 @@
             
             <!-- Lista de itens -->
             {% for r in receitas %}
-                <div style="background: #f5fff5; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-                    
-                    <div style="display: flex; align-items: center;">
+            <div style="background: #f5fff5; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
 
-                        {% if r.foto %}
-                            <img src="{{ r.foto.url }}" 
-                                 alt="Foto" 
-                                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
-                        {% endif %}
+    <div style="display: flex; align-items: center; gap: 15px;">
+        {% if r.foto %}
+            <img src="{{ r.foto.url }}" 
+                alt="Foto" 
+                style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+        {% endif %}
 
-                        <div style="flex: 1;">
-                            <h3 style="margin: 0; color:#088341;">{{ r.nome }}</h3>
-                            <p style="margin: 5px 0;">Autor: {{ r.autor.usuario.nome }}</p>
-                            <p style="margin: 5px 0;"><strong>Preço:</strong> R$ {{ r.preco }}</p>
-                        </div>
+        <div style="flex: 1;">
+            <h3 style="margin: 0; color:#088341;">{{ r.nome }}</h3>
+            <p style="margin: 5px 0;">Autor: {{ r.autor.usuario.nome }}</p>
+            <p style="margin: 5px 0;"><strong>Preço:</strong> R$ {{ r.preco }}</p>
+        </div>
+    </div>
 
-                        <!-- Remover -->
-                        <form method="POST" action="{% url 'remover_do_carrinho' r.id %}">
-                            {% csrf_token %}
-                            <button class="botao-link" 
-                                    style="background:#ff4444; padding: 8px 12px; border-radius: 8px;">
-                                Remover
-                            </button>
-                        </form>
+    <!-- Remover embaixo -->
+    <form method="POST" 
+          action="{% url 'remover_do_carrinho' r.id %}"
+          style="margin-top: 12px; text-align: right;">
+        {% csrf_token %}
+        <button class="botao-link" 
+                style="background:#ff4444; padding: 8px 12px; border-radius: 8px;">
+            Remover
+        </button>
+    </form>
 
-                    </div>
-                </div>
+</div>
             {% endfor %}
 
             <hr style="margin: 20px 0;">
