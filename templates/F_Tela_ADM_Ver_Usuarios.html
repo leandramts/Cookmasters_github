@@ -16,8 +16,17 @@
         </thead>
         <tbody>
             {% for user in usuarios %}
-            <tr>
-                <td>{{ user.nome }}</td>
+           <tr>
+                <td>
+                    {# 1. Exibir o nome, e se for CHEFE, criar o link #}
+                    {% if user.e_chefe %}
+                        <a href="{% url 'visualizar_chefe' user.e_chefe.id %}" class="text-decoration-none">
+                            <strong>{{ user.nome }}</strong>
+                        </a>
+                    {% else %}
+                        {{ user.nome }}
+                    {% endif %}
+                </td>
                 <td>{{ user.email }}</td>
 
                 <td>
@@ -53,6 +62,14 @@
             </tr>
             {% endfor %}
         </tbody>
+         
     </table>
+    <div class="mt-4 text-center">
+        <a href="{% url 'home' %}" class="btn btn-secondary btn-lg">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
 </div>
+
 {% endblock %}

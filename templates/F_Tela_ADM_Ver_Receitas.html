@@ -24,8 +24,11 @@
                     {% else %}
                         —
                     {% endif %}
+               <td>
+                    <a href="{% url 'visualizar_receita' r.id %}" class="text-decoration-none">
+                        <strong>{{ r.nome }}</strong>
+                    </a>
                 </td>
-                <td>{{ r.nome }}</td>
                 <td>{{ r.autor.usuario.nome }}</td>
                 <td>R$ {{ r.preco }}</td>
 
@@ -39,7 +42,13 @@
             </tr>
             {% endfor %}
         </tbody>
+        
     </table>
-
+    
+    <div class="mt-4 text-center">
+        <a href="{% url 'home' %}" class="btn btn-secondary btn-lg">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
 </div>
 {% endblock %}
