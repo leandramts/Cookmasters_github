@@ -654,6 +654,7 @@ def chefe_excluir_receita(request, receita_id):
 
     return redirect('visualizar_receita', receita_id=receita_id)
 
+#Caso de Uso - Carrinho
 
 @login_required
 def adicionar_ao_carrinho(request, receita_id):
@@ -768,7 +769,7 @@ def pagamento_carrinho(request):
         "total": total
     })
 
-
+#Caso de Uso - Visualizar Receitas Compradas
 @login_required
 def minhas_receitas(request):
     try:
@@ -786,7 +787,7 @@ def minhas_receitas(request):
     })
 
 
-
+#UC11 - Gerenciar Usuários
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def listar_usuarios(request):
@@ -812,6 +813,7 @@ def desbloquear_usuario(request, user_id):
     messages.success(request, "Usuário desbloqueado com sucesso.")
     return redirect("listar_usuarios")
 
+#UC12 - Gerenciar conteúdos
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def listar_receitas(request):
